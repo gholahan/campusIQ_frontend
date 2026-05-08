@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/features/auth';
 import { Avatar } from '@/shared/components/ui';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ export function AvatarMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const signOut = useAuthStore(s=> s.signOut)
 
 useEffect(() => {
   function handleClick(e: MouseEvent) {
@@ -19,7 +21,7 @@ useEffect(() => {
   return () => document.removeEventListener('mousedown', handleClick);
 }, []);
   return (
-    <div ref={ref} className="relative md:hidden z-[1000]">
+    <div ref={ref} className="relative md:hidden z-1000">
       {/* Trigger */}
       <button
         onClick={() => setOpen((o) => !o)}
@@ -68,10 +70,7 @@ useEffect(() => {
           <div className="my-1 h-px bg-[var(--border)]" />
 
           <button
-            onClick={() => {
-              navigate('/');
-              setOpen(false);
-            }}
+            onClick={() =>{ signOut ; navigate("/")}}
             className="menu-item text-red-500"
           >
             Log Out

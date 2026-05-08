@@ -40,7 +40,7 @@ export function Navbar() {
   const { isDark, toggle } = useTheme();
 
   return (
-    <nav className="overflow-visible sticky top-0 z-[100] backdrop-blur-xl border-b px-4 md:px-6 lg:px-8 h-16 flex items-center justify-between
+    <nav className="overflow-visible sticky top-0 z-[100] backdrop-blur-xl border-b py-3 px-4 md:px-6 lg:px-8 h-16 flex items-center justify-between
                     bg-[var(--bg2)]/90 border-[var(--border)]">
       {/* Brand */}
       <div

@@ -17,6 +17,7 @@ import { TutorChat }         from '@/pages/tutor/TutorChat';
 import { AdminDashboard }    from '@/pages/admin/AdminDashboard';
 import { AdminUsers }        from '@/pages/admin/AdminUsers';
 import { AdminModeration }   from '@/pages/admin/AdminModeration';
+import { AuthCallback } from '@/pages/auth/AuthCallback';
 
 export function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export function AppRoutes() {
         <Route index         element={<LandingPage />} />
         <Route path="login"  element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Route>
       
       {/* ── Student ── */}

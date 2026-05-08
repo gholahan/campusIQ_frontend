@@ -1,13 +1,17 @@
+import { useAuthStore } from '@/features/auth/authStore';
+import { AuthInitializer } from '@/features/auth/hooks/useAuth';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider }  from '@/features/auth/hooks/useAuth';
-import { AppRoutes }     from './routes';
+import { AppRoutes } from './routes';
 
 export default function App() {
+  // Initialize the auth store
+  useAuthStore.getState().initialize();
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <AuthInitializer>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  </AuthInitializer>
   );
 }

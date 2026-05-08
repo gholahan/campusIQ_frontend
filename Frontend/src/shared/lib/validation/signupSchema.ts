@@ -4,7 +4,6 @@ export interface SignupValues {
   firstName:  string;
   lastName:   string;
   email:      string;
-  staffId:    string;
   password:   string;
   confirmPassword: string;
   courses:    string; // tutor only — comma-separated
@@ -21,9 +20,6 @@ export const signupSchema = (isTutor: boolean) =>
     email: Yup.string()
       .required('Email is required')
       .email('Enter a valid university email'),
-    staffId: Yup.string()
-      .required('Student / Staff ID is required')
-      .matches(/^[A-Z]\d{6,}$/, 'ID must start with a letter followed by 6+ digits (e.g. U2024001)'),
     password: Yup.string()
       .required('Password is required')
       .min(8, 'Password must be at least 8 characters')
@@ -41,7 +37,6 @@ export const signupInitialValues: SignupValues = {
   firstName:       '',
   lastName:        '',
   email:           '',
-  staffId:         '',
   password:        '',
   confirmPassword: '',
   courses:         '',
