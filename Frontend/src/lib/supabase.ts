@@ -10,8 +10,4 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl,supabaseAnonKey)
 
-// test console
-const { data } = await supabase.auth.getSession()
-console.log(data)
-
 

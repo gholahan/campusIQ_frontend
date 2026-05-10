@@ -5,14 +5,12 @@ import { Avatar } from '@/shared/components/ui';
 import { FieldError } from '@/shared/components/ui';
 import { fieldClass } from '@/shared/lib/fieldClass';
 import { bookingSchema, bookingInitialValues } from '@/shared/lib/validation/bookingSchema';
-import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+
 import { Dropdown } from '@/shared/components/ui/DropDown';
 
 const KEYS = ['Tutor', 'Duration', 'Time', 'Cost'] as const;
 
 export function BookingPage() {
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { tutorId } = useParams<{ tutorId: string }>();
   const t = TUTORS.find((t) => t.id === Number(tutorId)) ?? TUTORS[0];
@@ -25,7 +23,6 @@ export function BookingPage() {
       console.log('[Booking] submitted:', {
         tutor: t.name,
         tutorId: t.id,
-        slot: slots[values.slot!],
         ...values,
       });
       navigate('/student/booking/confirmed');

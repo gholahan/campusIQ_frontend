@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Conversation, ConvoTab } from '@/features/chat/types';
+import type {ConvoTab } from '@/features/chat/types';
 import { Avatar } from '@/shared/components/ui';
 
 interface ConversationListProps { tabs: ConvoTab[]; basePath: string; }

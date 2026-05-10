@@ -1,131 +1,156 @@
-import { create } from 'zustand'
-import { supabase } from '@/lib/supabase'
-import type { User, Session } from '@supabase/supabase-js'
+import { create } from "zustand";
+import { supabase } from "@/lib/supabase";
+import type { User, Session, AuthResponse } from "@supabase/supabase-js";
+
+export type AuthStatus =
+  | "loading"
+  | "anonymous"
+  | "authenticated"
+  | "verification_pending";
 
 interface AuthState {
-  user: User | null
-  session: Session | null
-  loading: boolean
-  initialized: boolean
+  user: User | null;
+  session: Session | null;
+  accessToken: string | null;
+  status: AuthStatus;
+  initialized: boolean;
 
-  signUp: (email: string, password: string) => Promise<void>
-  signIn: (email: string, password: string) => Promise<void>
-  signInWithGoogle: () => Promise<void>
-  signOut: () => Promise<void>
-
-  initialize: () => () => void // returns cleanup
+  signUp: (email: string, password: string) => Promise<AuthResponse>;
+  signIn: (email: string, password: string) => Promise<AuthResponse>;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  initialize: () => () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   session: null,
-  loading: true,
+  accessToken: null,
+  status: "loading",
   initialized: false,
 
+  // ================= SIGN UP =================
   signUp: async (email, password) => {
-    set({ loading: true })
+    set({ status: "loading" });
 
-    const { data, error } = await supabase.auth.signUp({
+    const res = await supabase.auth.signUp({
       email,
       password,
-    })
+    });
+
+    const { data, error } = res;
 
     if (error) {
-      set({ loading: false })
-      throw error
+      set({ status: "anonymous" });
+      throw error;
     }
 
-    // Only trust session if it exists (email confirmation may block login)
-    set({
-      user: data.session ? data.user : null,
-      session: data.session,
-      loading: false,
-    })
+    /**
+     * IMPORTANT:
+     * session is NULL when email confirmation is ON
+     */
+    if (!data.session) {
+      set({
+        user: data.user ?? null,
+        session: null,
+        accessToken: null,
+        status: "verification_pending",
+      });
+    } else {
+      set({
+        user: data.user ?? null,
+        session: data.session,
+        accessToken: data.session.access_token,
+        status: "authenticated",
+      });
+    }
+
+    return res;
   },
 
+  // ================= SIGN IN =================
   signIn: async (email, password) => {
-    set({ loading: true })
+    set({ status: "loading" });
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const res = await supabase.auth.signInWithPassword({
       email,
       password,
-    })
+    });
+
+    const { data, error } = res;
 
     if (error) {
-      set({ loading: false })
-      throw error
+      set({ status: "anonymous" });
+      throw error;
     }
 
     set({
       user: data.user,
       session: data.session,
-      loading: false,
-    })
+      accessToken: data.session.access_token,
+      status: "authenticated",
+    });
+
+    return res;
   },
 
+  // ================= GOOGLE =================
   signInWithGoogle: async () => {
-    set({ loading: true })
+    set({ status: "loading" });
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-
-      if (error) {
-        set({ loading: false })
-        throw error
-      }
-
-      // redirect happens → don't reset loading here
-  },
-
-  signOut: async () => {
-    set({ loading: true })
-
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
 
     if (error) {
-      set({ loading: false })
-      throw error
+      set({ status: "anonymous" });
+      throw error;
     }
+  },
+
+  // ================= SIGN OUT =================
+  signOut: async () => {
+    await supabase.auth.signOut();
 
     set({
       user: null,
       session: null,
-      loading: false,
-    })
+      accessToken: null,
+      status: "anonymous",
+    });
   },
 
+  // ================= INIT (SOURCE OF TRUTH) =================
   initialize: () => {
-    // prevent double init (React StrictMode safe)
-    if (get().initialized) return () => {}
+    if (get().initialized) return () => {};
 
-    // initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data }) => {
+      const session = data.session;
+
       set({
         session,
         user: session?.user ?? null,
-        loading: false,
+        accessToken: session?.access_token ?? null,
+        status: session ? "authenticated" : "anonymous",
         initialized: true,
-      })
-    })
+      });
+    });
 
-    // listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        set({
-          session,
-          user: session?.user ?? null,
-          loading: false,
-          initialized: true,
-        })
-      }
-    )
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      set({
+        session,
+        user: session?.user ?? null,
+        accessToken: session?.access_token ?? null,
+        status: session ? "authenticated" : "anonymous",
+        initialized: true,
+      });
+    });
 
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe();
   },
-}))
+}));

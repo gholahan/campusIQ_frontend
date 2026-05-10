@@ -18,6 +18,7 @@ import { AdminDashboard }    from '@/pages/admin/AdminDashboard';
 import { AdminUsers }        from '@/pages/admin/AdminUsers';
 import { AdminModeration }   from '@/pages/admin/AdminModeration';
 import { AuthCallback } from '@/pages/auth/AuthCallback';
+import BookedSessions from '@/pages/student/BookedSessions';
 
 export function AppRoutes() {
   return (
@@ -40,6 +41,7 @@ export function AppRoutes() {
         <Route path="student/chat"              element={<StudentChat />} />
         <Route path="student/chat/:convoId"     element={<StudentChat />} />
         <Route path="student/ai"                element={<AIAssistant />} />
+        <Route path="student/booking"           element={<BookedSessions />} />
       </Route>
 
       {/* ── Tutor ── */}

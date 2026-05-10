@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TUTORS } from '@/shared/data/tutors';
 import { Avatar, Stars } from '@/shared/components/ui';
 import { Search } from 'lucide-react';
+import { Dropdown } from '@/shared/components/ui/DropDown';
 
 const CHIPS = ['All', 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Engineering'];
 
@@ -10,6 +11,8 @@ export function TutorSearch() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [active, setActive] = useState('All');
+  const [rating, setRating] = useState('Any Rating');
+  const [price, setPrice] = useState('Any Price');
   const filtered = TUTORS.filter((t) => {
     const ms = t.name.toLowerCase().includes(search.toLowerCase()) || t.courses.some((c) => c.toLowerCase().includes(search.toLowerCase()));
     const mc = active === 'All' || t.courses.some((c) => c.toLowerCase().includes(active.toLowerCase()));
@@ -23,23 +26,83 @@ export function TutorSearch() {
         <p className="text-[var(--text2)] text-sm">Browse {TUTORS.length} expert tutors across all subjects</p>
       </div>
 
-      <div className="flex gap-3 items-center p-3 mb-6 rounded-card" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <span className="text-lg text-[var(--text3)]"><Search size={18} /></span>
-        <input
-          className="flex-1 bg-transparent border-none text-sm text-[var(--text)] focus:outline-none placeholder:text-[var(--text3)]"
-          placeholder="Search by name, course, or skill..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <div className="mb-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 pb-0">
+  <div
+    className="
+      flex flex-col gap-3
+      md:flex-row md:items-start
+    "
+  >
+    {/* Search */}
+    <div
+      className="
+        flex items-center gap-3
+        rounded-xl
+        border border-[var(--border)]
+        bg-[var(--bg2)]
+        px-3 py-3
+        flex-1 min-w-0
+      "
+    >
+      <Search
+        size={18}
+        className="text-[var(--text3)] shrink-0"
+      />
+
+      <input
+        className="
+          flex-1 min-w-0
+          bg-transparent
+          border-none
+          outline-none
+          text-sm
+          text-[var(--text)]
+          placeholder:text-[var(--text3)]
+        "
+        placeholder="Search tutors, courses..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
+
+    {/* Filters */}
+    <div
+      className="
+        flex gap-2
+        w-full md:w-auto
+      "
+    >
+      <div className="flex-1 md:w-[170px]">
+        <Dropdown
+          label=""
+          value={rating}
+          onChange={setRating}
+          options={[
+            'Any Rating',
+            '4.5+',
+            '4.8+',
+          ]}
         />
-        <select className="form-input" style={{ width: 'auto', padding: '8px 12px', borderRadius: 8 }}>
-          <option>Any Rating</option><option>4.5+</option><option>4.8+</option>
-        </select>
-        <select className="form-input" style={{ width: 'auto', padding: '8px 12px', borderRadius: 8 }}>
-          <option>Any Price</option><option>Under ₦5k/hr</option><option>₦5k–10k/hr</option>
-        </select>
       </div>
 
-      <div className="filter-chips flex gap-2 mb-5">
+      <div className="flex-1 md:w-[170px]">
+        <Dropdown
+          label=""
+          value={price}
+          onChange={setPrice}
+          options={[
+            'Any Price',
+            'Under ₦5k/hr',
+            '₦5k–10k/hr',
+          ]}
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+      <div className="flex gap-2 mb-5 overflow-x-auto no-scrollbar pb-1"
+>
         {CHIPS.map((c) => (
           <button key={c} className={`chip${active === c ? ' active' : ''}`} onClick={() => setActive(c)}>{c}</button>
         ))}

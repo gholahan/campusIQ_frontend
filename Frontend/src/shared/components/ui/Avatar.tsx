@@ -1,11 +1,30 @@
 interface AvatarProps {
-  name: string;
+  name: string | undefined;
   color?: string;
   size?: number;
   initials?: string;
 }
 
-export function Avatar({ name, color = 'var(--accent)', size = 38, initials }: AvatarProps) {
+const getInitials = (name?: string) => {
+  if (!name) return "";
+
+  const parts = name.trim().split(" ").filter(Boolean);
+
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+
+  return (first + last).toUpperCase();
+};
+
+export function Avatar({
+  name,
+  color = 'var(--accent)',
+  size = 38,
+  initials,
+}: AvatarProps) {
+
+  const fallbackInitials = getInitials(name);
+
   return (
     <div
       style={{
@@ -22,7 +41,7 @@ export function Avatar({ name, color = 'var(--accent)', size = 38, initials }: A
         flexShrink: 0,
       }}
     >
-      {initials ?? name?.slice(0, 2).toUpperCase()}
+      {initials ?? fallbackInitials}
     </div>
   );
 }
