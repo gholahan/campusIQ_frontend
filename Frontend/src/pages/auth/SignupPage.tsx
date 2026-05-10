@@ -11,14 +11,16 @@ import {
 
 import { FieldError } from '@/shared/components/ui';
 import { fieldClass } from '@/shared/lib/fieldClass';
-
 import { useAuthStore } from '@/features/auth/authStore';
-
 import { FcGoogle } from 'react-icons/fc';
 import { GraduationCap, BookOpen } from 'lucide-react';
+import { useSyncUser } from '@/features/auth/hooks/useAuthApi';
 
 export function SignupPage() {
+  const { syncUserAsync} = useSyncUser();
   const { signUp, signInWithGoogle } = useAuthStore();
+  const [authError, setAuthError] = useState<string>('');
+  const status = useAuthStore(s => s.status);
 
   const navigate = useNavigate();
 
@@ -34,22 +36,33 @@ export function SignupPage() {
       signupSchema(isTutor),
 
     onSubmit: async (values) => {
-      console.log('[Signup] submitted:', {
+    try {
+      console.log("[Signup] submitted:", {
         role,
         ...values,
       });
 
-      await signUp(
+      const res = await signUp(
         values.email,
-        values.confirmPassword
+        values.password
       );
+      
+      console.log("res:", res)
+        await syncUserAsync({
+        role,
+        first_name: values.firstName,
+        last_name: values.lastName,
+      });
 
       navigate(
         isTutor
-          ? '/tutor/dashboard'
-          : '/student/dashboard'
+          ? "/tutor/dashboard"
+          : "/student/dashboard"
       );
-    },
+    } catch (err: any) {
+      setAuthError(err.message || "Login failed");
+    }
+  },
   });
 
   const err = (
@@ -59,15 +72,19 @@ export function SignupPage() {
       ? formik.errors[f]
       : undefined;
 
-  const lbl =
-    'block text-[13px] font-medium text-[var(--text2)] mb-1.5';
+  const lbl ='block text-[13px] font-medium text-[var(--text2)] mb-1.5';
+
+  if (status === "verification_pending") {
+    return (
+      <div>
+        Check your email to verify your account.
+      </div>
+    );
+  }
 
   return (
     <div
-      className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-4 py-6
-overflow-hidden
-      "
-    >
+      className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-4 py-6 overflow-hidden">
       <div
         className="
           w-full max-w-md
@@ -353,10 +370,11 @@ overflow-hidden
                 />
               </div>
             )}
-
+          {authError && <div className="mb-4 text-red-500 text-sm">{authError}</div>}
             {/* SUBMIT */}
             <button
               type="submit"
+              disabled={formik.isSubmitting}
               className="
                 btn-primary
                 w-full justify-center
@@ -364,9 +382,13 @@ overflow-hidden
                 text-[15px]
                 font-semibold
                 mt-2
+                disabled:opacity-50
+                disabled:cursor-not-allowed
               "
             >
-              Create Account
+              {formik.isSubmitting
+                ? "Creating Account..."
+                : "Create Account"}
             </button>
           </form>
 

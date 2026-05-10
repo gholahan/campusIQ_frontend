@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { TUTORS } from '@/shared/data/tutors';
 import { STUDENT_TUTOR_CONVOS } from '@/features/chat/data/conversations';
 import { Avatar, Stars } from '@/shared/components/ui';
+import { useGetProfile } from '@/features/auth/hooks/useAuthApi';
 
 const STATS = [
   { label: 'Sessions This Week', value: 2,   icon: '📅', color: 'blue',   change: '+1 from last week' },
@@ -16,10 +17,11 @@ const SESSIONS = [
 
 export function StudentDashboard() {
   const navigate = useNavigate();
+  const {user} = useGetProfile()
   return (
     <div className="page-enter">
       <div className="mb-7">
-        <h1 className="font-display text-[26px] font-extrabold mb-1 tracking-[-0.5px] text-[var(--text)]">Good morning, Sam! 👋</h1>
+        <h1 className="font-display text-[26px] font-extrabold mb-1 tracking-[-0.5px] text-[var(--text)]">Good morning ! {user?.first_name} 👋</h1>
         <p className="text-[var(--text2)] text-sm">You have 2 sessions scheduled this week</p>
       </div>
 
@@ -65,7 +67,7 @@ export function StudentDashboard() {
           </div>
           <div className="flex flex-col gap-2.5">
             {SESSIONS.map((s, i) => (
-              <div className="session-card flex items-center min-h-[64px] overflow-hidden">
+              <div key={i} className="session-card flex items-center min-h-[64px] overflow-hidden">
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-sm truncate">{s.title}</div>
                   <div className="text-[12px] text-[var(--text2)] truncate">{s.sub}</div>

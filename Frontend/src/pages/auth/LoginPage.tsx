@@ -8,12 +8,10 @@ import { Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
+import { get_user_profile } from '@/features/auth/api/authApi';
+import { useQueryClient } from '@tanstack/react-query';
 
-const ROLES: { r: Role; icon: string; label: string }[] = [
-  { r: 'student', icon: '🎓', label: 'Student' },
-  { r: 'tutor',   icon: '📚', label: 'Tutor' },
-  { r: 'admin',   icon: '🛡️', label: 'Admin' },
-];
+
 const DASHBOARD: Record<Role, string> = {
   student: '/student/dashboard', tutor: '/tutor/dashboard', admin: '/admin/dashboard',
 };
@@ -21,22 +19,28 @@ const DASHBOARD: Record<Role, string> = {
 export function LoginPage() {
   const {signIn, signInWithGoogle} = useAuthStore()
   const navigate = useNavigate();
-  const [role, setRole] = useState<Role>('student');
-  const [error, setError] = useState<string>('');
-    // const signIn = useAuthStore((s) => s.signIn)
+  const queryClient = useQueryClient();
+  const [authError, setAuthError] = useState<string>('');
 
   const formik = useFormik({
     initialValues: loginInitialValues,
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-      setError('');
-      try {
-        await signIn(values.email, values.password);
-        navigate(DASHBOARD[role]);
-      } catch (err: any) {
-        setError(err.message || 'Login failed');
-      }
-    },
+    setAuthError("");
+
+    try {
+      await signIn(values.email, values.password);
+
+      const profile = await get_user_profile();
+      console.log(profile)
+
+      queryClient.setQueryData(["profile"], profile);
+
+      navigate(DASHBOARD[profile.role]);
+    } catch (err: any) {
+      setAuthError(err.message || "Login failed");
+    }
+  },
   });
 
   return (
@@ -44,19 +48,19 @@ export function LoginPage() {
       <div className="card p-10 w-full max-w-md">
         <div className="text-center mb-7">
           <div
-  className="
-    w-12 h-12 mx-auto mb-4
-    rounded-2xl
-    border border-[var(--border)]
-    bg-[var(--bg2)]
-    flex items-center justify-center
-  "
->
-  <Sparkles
-    size={20}
-    className="text-[var(--accent2)]"
-  />
-</div>
+            className="
+              w-12 h-12 mx-auto mb-4
+              rounded-2xl
+              border border-(--border)
+              bg-(--bg2)
+              flex items-center justify-center
+            "
+          >
+            <Sparkles
+              size={20}
+              className="text-[var(--accent2)]"
+            />
+          </div>
           <h2 className="font-display text-[26px] font-extrabold mb-1 text-(--text)">Welcome back</h2>
           <p className="text-(--text2) text-sm">Sign in to continue your learning journey</p>
         </div>
@@ -74,14 +78,28 @@ export function LoginPage() {
           <FieldError message={formik.touched.password ? formik.errors.password : undefined} />
         </div>
 
-        {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
+        {authError && <div className="mb-4 text-red-500 text-sm">{authError}</div>}
 
         <div className="flex justify-end mb-5">
           <span className="text-[13px] text-(--accent2) cursor-pointer font-medium">Forgot password?</span>
         </div>
 
-        <button type="submit" className="btn-primary w-full justify-center py-3 text-[15px] font-bold">
-          Sign In →
+        <button
+          type="submit"
+          disabled={formik.isSubmitting}
+          className="
+            btn-primary
+            w-full justify-center
+            py-3
+            text-[15px]
+            font-bold
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+          "
+        >
+          {formik.isSubmitting
+            ? "Signing In..."
+            : "Sign In →"}
         </button>
 
       </form>

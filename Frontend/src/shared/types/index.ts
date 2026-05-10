@@ -1,5 +1,6 @@
 // ── App-wide types shared across all layers ──────────────────
 
+import type { LucideIcon } from 'lucide-react';
 export type Role = 'student' | 'tutor' | 'admin';
 
 export interface Tutor {
@@ -17,10 +18,10 @@ export interface Tutor {
   available: string[];
 }
 
-export interface BottomNavLink {
+export type BottomNavLink = {
   key: string;
   path: string;
-  icon: string;
+  icon: LucideIcon;
   label: string;
   badge?: number;
-}
+};
