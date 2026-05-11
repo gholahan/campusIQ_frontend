@@ -1,115 +1,252 @@
 import { useNavigate } from 'react-router-dom';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Avatar, Stars } from '@/shared/components/ui';
+import { useRef } from 'react';
+import { fadeUp, staggerContainer } from '@/shared/animations/motion';
 
 const FEATURES = [
   { icon: '🎯', title: 'Find Expert Tutors',      desc: 'Browse verified peer tutors by course, rating, availability, and hourly rate.' },
-  { icon: '✦',  title: 'AI Academic Assistant',   desc: 'Get instant intelligent answers to your academic questions 24/7, any time.' },
-  { icon: '💬', title: 'Real-Time Collaboration', desc: 'Chat, share files, and work through problems together in real time.' },
-  { icon: '📅', title: 'Easy Scheduling',         desc: 'Book sessions in seconds. View tutor availability and confirm instantly.' },
-  { icon: '📊', title: 'Track Progress',          desc: 'Monitor your learning journey with session history and performance insights.' },
-  { icon: '⭐', title: 'Trusted Community',       desc: 'Every tutor is rated by students. Read reviews, choose tutors you trust.' },
+  { icon: '✦',  title: 'AI Academic Assistant',   desc: 'Get instant intelligent answers to your academic questions 24/7.'},
+  { icon: '💬', title: 'Real-Time Collaboration', desc: 'Chat, share files, and solve problems together in one workspace.'             },
+  { icon: '📅', title: 'Easy Scheduling',          desc: 'Book sessions instantly with live calendar availability.'                    },
+  { icon: '📊', title: 'Track Progress',           desc: 'Monitor your learning history and growth over time.'                        },
+  { icon: '⭐', title: 'Trusted Community',        desc: 'Every tutor is student-rated and verified by our team.'                     },
 ];
+
 const TESTIMONIALS = [
-  { text: 'CampusIQ completely changed how I study. My tutor walked me through data structures step by step — I went from failing to acing the exam.', name: 'Tunde Bakare',     role: 'CS Year 2',         color: 'var(--accent)' },
-  { text: 'The AI assistant is incredible for late-night study sessions. It breaks down calculus concepts so clearly.',                                  name: 'Blessing Eze',     role: 'Maths Year 3',      color: 'var(--cgreen)' },
-  { text: 'I found a chemistry tutor within minutes. The booking process is seamless and chat makes sessions feel natural.',                             name: 'Ifeoluwa Adeyemi', role: 'Bio-chem Year 1',    color: 'var(--cpurple)' },
-  { text: 'As an international student it was hard finding help. CampusIQ connected me with tutors who speak my language of understanding.',             name: 'Kwabena Mensah',   role: 'Engineering Year 2', color: 'var(--corange)' },
-  { text: "I became a tutor on this platform and it's been amazing. I help students, earn money, and reinforce my own understanding.",                   name: 'Amara Osei',       role: 'CS Tutor / PhD',     color: 'var(--accent2)' },
-  { text: "The dashboard makes it so easy to track all my sessions. I know exactly what's covered and what's left to revise.",                          name: 'Ngozi Chibuike',   role: 'Physics Year 3',     color: 'var(--cred)' },
+  { text: 'CampusIQ completely changed how I study. I went from failing to first class.', name: 'Tunde Bakare',     role: 'CS · Year 2',      color: 'var(--accent)'   },
+  { text: 'The AI assistant breaks down calculus better than lectures.',                  name: 'Blessing Eze',     role: 'Maths · Year 3',   color: 'var(--cgreen)'  },
+  { text: 'Found a tutor in minutes. Smooth experience.',                                 name: 'Ifeoluwa Adeyemi', role: 'Biology · Year 1', color: 'var(--cpurple)' },
+  { text: 'Very intuitive platform even as a foreign student.',                           name: 'Kwabena Mensah',   role: 'Engineering',      color: 'var(--corange)' },
 ];
+
 const STATS = [
-  { num: '2,400+', label: 'Active Students' }, { num: '180+', label: 'Expert Tutors' },
-  { num: '12,000+', label: 'Sessions Completed' }, { num: '4.9★', label: 'Average Rating' },
+  { num: '2,400+',  label: 'Active Students'   },
+  { num: '180+',    label: 'Expert Tutors'      },
+  { num: '12,000+', label: 'Sessions Completed' },
+  { num: '4.9★',    label: 'Average Rating'     },
 ];
+
+function HeroOrbs() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[var(--accent)]/10 blur-[120px] animate-pulse" />
+      <div className="absolute top-1/3 -left-32 w-72 h-72 rounded-full bg-[var(--accent2)]/10 blur-[90px]" />
+      <div className="absolute top-1/4 -right-24 w-56 h-56 rounded-full bg-[var(--cpurple)]/10 blur-[80px]" />
+    </div>
+  );
+}
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const heroRef  = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const heroY       = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+
   return (
-    <div className="page-enter">
-      {/* Hero */}
-      <div className="min-h-[88vh] flex flex-col items-center justify-center text-center px-6 py-20 relative">
-        <div
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-semibold mb-7 text-[var(--accent2)]"
-          style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)' }}
-        >
-          ✦ AI-Powered Learning Platform
-        </div>
-        <h1
-          className="font-display font-extrabold leading-[1.05] mb-5 tracking-[-2px] text-[var(--text)]"
-          style={{ fontSize: 'clamp(40px,7vw,76px)' }}
-        >
-          Learn Smarter with<br />
-          <span className="gradient-text">Peer Tutors & AI</span>
-        </h1>
-        <p className="text-lg text-[var(--text2)] max-w-[560px] mx-auto mb-10 leading-relaxed">
-          Connect with expert peer tutors, get instant AI academic help, and ace your courses — all in one modern platform.
-        </p>
-        <div className="flex flex-wrap gap-3 justify-center mb-14">
-          <button className="btn-primary text-[15px] px-7 py-3.5" onClick={() => navigate('/signup')}>Get Started Free →</button>
-          <button className="btn-secondary text-[15px] px-7 py-3.5" onClick={() => navigate('/student/tutors')}>Browse Tutors</button>
-        </div>
-        <div className="flex flex-wrap gap-12 justify-center">
-          {STATS.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="font-display text-[28px] font-extrabold text-[var(--text)]">{s.num}</div>
-              <div className="text-[13px] text-[var(--text3)] mt-0.5">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="overflow-x-hidden">
 
-      {/* Features */}
-      <div className="py-20 px-6 max-w-[1100px] mx-auto">
-        <h2 className="font-display text-[36px] font-extrabold text-center mb-3 tracking-[-1px] text-[var(--text)]">Everything You Need to Excel</h2>
-        <p className="text-center text-[var(--text2)] text-base mb-14">One platform. Peer tutoring, AI assistance, and real-time collaboration.</p>
-        <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))' }}>
-          {FEATURES.map((f) => (
-            <div key={f.title} className="feature-card">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[22px] mb-4 bg-[var(--bg3)]">{f.icon}</div>
-              <h3 className="font-display font-bold text-[17px] mb-3 text-[var(--text)]">{f.title}</h3>
-              <p className="text-[var(--text2)] text-sm leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ── HERO ── */}
+      <motion.section
+        ref={heroRef}
+        initial="hidden"
+        animate="show"
+        variants={staggerContainer}
+        className="relative min-h-[100svh] flex flex-col justify-center items-center text-center px-4 sm:px-6 pt-16 pb-24"
+      >
+        <HeroOrbs />
 
-      {/* Testimonials */}
-      <div className="py-20 px-6 max-w-[1100px] mx-auto">
-        <h2 className="font-display text-[36px] font-extrabold text-center mb-3 tracking-[-1px] text-[var(--text)]">Loved by Students</h2>
-        <p className="text-center text-[var(--text2)] text-base mb-14">Hear what students across campus are saying about CampusIQ.</p>
-        <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))' }}>
-          {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="card p-6">
-              <div className="text-[13px] mb-2"><Stars rating={5} /></div>
-              <p className="text-[var(--text2)] text-sm leading-relaxed italic mb-4">"{t.text}"</p>
-              <div className="flex items-center gap-2.5">
-                <Avatar name={t.name} color={t.color} size={36} />
-                <div>
-                  <div className="font-semibold text-sm text-[var(--text)]">{t.name}</div>
-                  <div className="text-xs text-[var(--text3)]">{t.role}</div>
-                </div>
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 flex flex-col items-center">
+
+          {/* Badge */}
+          <motion.div
+            variants={fadeUp}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold mb-8
+                       border border-[var(--border)] bg-[var(--bg3)] text-[var(--text2)]"
+          >
+            <span className="text-[var(--accent)]">✦</span> AI-Powered Learning Platform
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            variants={fadeUp}
+            className="font-display font-extrabold tracking-[-1.5px] leading-[1.08] text-[clamp(36px,6.5vw,76px)] max-w-4xl"
+          >
+            Learn Smarter with<br />
+            <span className="gradient-text">Tutors&nbsp;+&nbsp;AI</span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            variants={fadeUp}
+            className="mt-6 max-w-lg text-[var(--text2)] text-sm sm:text-base leading-relaxed"
+          >
+            Connect with verified peer tutors and get instant AI help — all in one platform built for African university students.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-3 mt-8">
+            <button className="btn-primary" onClick={() => navigate('/signup')}>
+              Get Started Free
+            </button>
+            <button className="btn-secondary" onClick={() => navigate('/student/tutors')}>
+              Browse Tutors
+            </button>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            variants={fadeUp}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-x-10 gap-y-6 mt-16 pt-10 border-t border-[var(--border)] w-full max-w-2xl"
+          >
+            {STATS.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="font-display font-bold text-xl sm:text-2xl text-[var(--text)]">{s.num}</div>
+                <div className="text-xs text-[var(--text3)] mt-0.5">{s.label}</div>
               </div>
-            </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[var(--bg)] to-transparent pointer-events-none" />
+      </motion.section>
+
+      {/* ── FEATURES ── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={staggerContainer}
+          className="text-center mb-14"
+        >
+          <motion.p variants={fadeUp} className="text-xs font-semibold text-[var(--accent)] uppercase tracking-widest mb-3">
+            Features
+          </motion.p>
+          <motion.h2 variants={fadeUp} className="font-display text-3xl sm:text-4xl font-bold">
+            Everything You Need
+          </motion.h2>
+          <motion.p variants={fadeUp} className="mt-4 text-[var(--text2)] text-sm sm:text-base max-w-md mx-auto">
+            One platform. All the tools to help you study better, connect faster, and perform your best.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {FEATURES.map((f) => (
+            <motion.div
+              key={f.title}
+              variants={fadeUp}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="card p-6 cursor-default group"
+            >
+              <div className="text-2xl mb-4 transition-transform duration-200 group-hover:scale-110 origin-left">
+                {f.icon}
+              </div>
+              <h3 className="font-bold text-[var(--text)] mb-1.5">{f.title}</h3>
+              <p className="text-sm text-[var(--text2)] leading-relaxed">{f.desc}</p>
+            </motion.div>
           ))}
+        </motion.div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 bg-[var(--bg2)] border-y border-[var(--border)]">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={staggerContainer}
+            className="text-center mb-14"
+          >
+            <motion.p variants={fadeUp} className="text-xs font-semibold text-[var(--accent)] uppercase tracking-widest mb-3">
+              Student Stories
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="font-display text-3xl sm:text-4xl font-bold">
+              Loved by Students
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={staggerContainer}
+            className="grid gap-5 sm:grid-cols-2"
+          >
+            {TESTIMONIALS.map((t, i) => (
+              <motion.div key={i} variants={fadeUp} className="card p-6 flex flex-col gap-4">
+                <Stars rating={5} />
+                <p className="text-sm text-[var(--text2)] leading-relaxed flex-1">
+                  "{t.text}"
+                </p>
+                <div className="flex items-center gap-3 pt-2 border-t border-[var(--border)]">
+                  <Avatar name={t.name} color={t.color} size={36} />
+                  <div>
+                    <div className="font-semibold text-sm text-[var(--text)]">{t.name}</div>
+                    <div className="text-xs text-[var(--text3)]">{t.role}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-      </div>
+      </section>
 
-      {/* CTA */}
-      <div className="text-center py-16 px-6 bg-[var(--bg3)] border-t border-[var(--border)]">
-        <h2 className="font-display text-[36px] font-extrabold mb-3 tracking-[-1px] text-[var(--text)]">Ready to Transform Your Learning?</h2>
-        <p className="text-[var(--text2)] mb-7 text-base">Join 2,400+ students already learning smarter on CampusIQ.</p>
-        <button className="btn-primary text-[16px] px-8 py-4" onClick={() => navigate('/signup')}>Create Free Account →</button>
-      </div>
+      {/* ── CTA ── */}
+      <section className="relative py-24 sm:py-32 text-center px-4 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
+          <div className="w-[500px] h-[500px] rounded-full bg-[var(--accent)]/8 blur-[100px]" />
+        </div>
 
-      {/* Footer */}
-      <footer className="py-10 px-8 text-center text-[13px] bg-[var(--bg3)] border-t border-[var(--border)] text-[var(--text3)]">
-        <div className="mb-2">© 2026 CampusIQ — AI-Powered Campus Tutorial Support System</div>
-        <div className="flex gap-5 justify-center flex-wrap">
-          {['About','Tutors','Privacy','Terms','Contact'].map((l) => (
-            <span key={l} className="cursor-pointer hover:text-[var(--text2)] transition-colors">{l}</span>
-          ))}
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={staggerContainer}
+          className="relative z-10 max-w-xl mx-auto"
+        >
+          <motion.p variants={fadeUp} className="text-xs font-semibold text-[var(--accent)] uppercase tracking-widest mb-4">
+            Get Started Today
+          </motion.p>
+          <motion.h2 variants={fadeUp} className="font-display text-3xl sm:text-4xl font-bold leading-tight">
+            Ready to transform<br className="hidden sm:block" /> your learning?
+          </motion.h2>
+          <motion.p variants={fadeUp} className="mt-5 text-[var(--text2)] text-sm sm:text-base">
+            Join thousands of students already using CampusIQ to study smarter.
+          </motion.p>
+          <motion.div variants={fadeUp} className="mt-8">
+            <button className="btn-primary" onClick={() => navigate('/signup')}>
+              Create Free Account
+            </button>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="py-8 text-center text-xs text-[var(--text3)] bg-[var(--bg2)] border-t border-[var(--border)]">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
+          <span className="font-display font-bold text-[var(--text2)]">CampusIQ</span>
+          <span className="hidden sm:block text-[var(--border)]">|</span>
+          <span>© 2026 CampusIQ. All rights reserved.</span>
+          <span className="hidden sm:block text-[var(--border)]">|</span>
+          <div className="flex gap-4">
+            <button className="hover:text-[var(--text)] transition-colors bg-transparent border-none cursor-pointer text-xs text-[var(--text3)]">Privacy</button>
+            <button className="hover:text-[var(--text)] transition-colors bg-transparent border-none cursor-pointer text-xs text-[var(--text3)]">Terms</button>
+            <button className="hover:text-[var(--text)] transition-colors bg-transparent border-none cursor-pointer text-xs text-[var(--text3)]">Contact</button>
+          </div>
         </div>
       </footer>
+
     </div>
   );
 }
