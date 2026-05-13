@@ -91,9 +91,6 @@ export function LandingPage() {
             <button className="btn-primary" onClick={() => navigate('/signup')}>
               Get Started Free
             </button>
-            {/* <button className="btn-secondary" onClick={() => navigate('/student/tutors')}>
-              Browse Tutors
-            </button> */}
           </motion.div>
 
           {/* Stats */}
@@ -115,7 +112,7 @@ export function LandingPage() {
       </motion.section>
 
       {/* ── FEATURES ── */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 max-w-6xl mx-auto">
+      <section className="py-18 sm:py-25 px-4 sm:px-6 max-w-6xl mx-auto">
         <motion.div
           initial="hidden"
           whileInView="show"

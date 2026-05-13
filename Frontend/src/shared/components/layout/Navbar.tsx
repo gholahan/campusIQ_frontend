@@ -89,19 +89,33 @@ export function Navbar() {
             </button>
           ))}
 
-          {!role && (
-            <>
-              <button
-                onClick={() => navigate('/login')}
-                className="px-3.5 py-2 rounded-lg text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all bg-transparent border-none cursor-pointer"
-              >
-                Log In
-              </button>
-              <button onClick={() => navigate('/signup')} className="btn-primary ml-2">
-                Get Started
-              </button>
-            </>
-          )}
+         {!role && (
+  <>
+    <button
+      onClick={() => navigate('/login')}
+      className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all border-none cursor-pointer
+        ${
+          pathname === '/login'
+            ? 'text-[var(--accent2)] bg-[var(--accent)]/10'
+            : 'text-[var(--text2)] bg-transparent hover:text-[var(--text)] hover:bg-[var(--bg3)]'
+        }`}
+    >
+      Log In
+    </button>
+
+    <button
+      onClick={() => navigate('/signup')}
+      className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all border-none cursor-pointer
+        ${
+          pathname === '/signup'
+            ? 'text-[var(--accent2)] bg-[var(--accent)]/10'
+            : 'text-[var(--text2)] bg-transparent hover:text-[var(--text)] hover:bg-[var(--bg3)]'
+        }`}
+    >
+      Get Started
+    </button>
+  </>
+)}
         </div>
 
         {/* ── Right cluster ── */}
@@ -156,7 +170,7 @@ export function Navbar() {
             <div className="flex flex-col gap-2 pt-2 border-t border-[var(--border)] mt-1">
               <button
                 onClick={() => { navigate('/login'); closeMobile(); }}
-                className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all bg-transparent border-none cursor-pointer"
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all bg-transparent border-none cursor-pointer"
               >
                 Log In
               </button>

@@ -2,8 +2,8 @@ import type { Role } from "@/shared/types";
 
 export interface SyncUserPayload {
   role: Role;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 export interface User {

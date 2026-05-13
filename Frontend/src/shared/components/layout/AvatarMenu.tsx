@@ -12,16 +12,21 @@ interface AvatarMenuProps {
 }
 
 export function AvatarMenu({ onNavigate, avatarOnly = false }: AvatarMenuProps) {
-  const [open, setOpen]   = useState(false);
-  const ref               = useRef<HTMLDivElement>(null);
-  const navigate          = useNavigate();
-  const signOut           = useAuthStore((s) => s.signOut);
-  const { user }          = useGetProfile();
+  const [open, setOpen]         = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const ref                     = useRef<HTMLDivElement>(null);
+  const navigate                = useNavigate();
+  const signOut                 = useAuthStore((s) => s.signOut);
+  const { user }                = useGetProfile();
 
   // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      if (!ref.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setLogoutError(null);
+      }
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -47,6 +52,28 @@ export function AvatarMenu({ onNavigate, avatarOnly = false }: AvatarMenuProps) 
     onNavigate?.();
   }
 
+  const handleLogout = async () => {
+    setLogoutError(null);
+    setIsLoggingOut(true);
+
+    try {
+      await signOut();
+
+      setOpen(false);
+      onNavigate?.();
+
+      navigate('/', { replace: true });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to log out. Please try again.';
+
+      setLogoutError(message);
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div ref={ref} className="relative z-[200]">
       {/* ── Trigger ── */}
@@ -56,7 +83,7 @@ export function AvatarMenu({ onNavigate, avatarOnly = false }: AvatarMenuProps) 
         aria-label="Account menu"
         aria-expanded={open}
       >
-        <Avatar name={profile_picture || fullName} size={28} />
+        <Avatar name={fullName} imageUrl={profile_picture} size={28}/>
 
         {/* Show name on md+ unless avatarOnly */}
         {!avatarOnly && (
@@ -85,7 +112,7 @@ export function AvatarMenu({ onNavigate, avatarOnly = false }: AvatarMenuProps) 
 
         {/* User info header */}
         <div className="px-3 pt-3 pb-2 flex items-center gap-2.5">
-          <Avatar name={fullName} size={32} />
+          <Avatar name={fullName} imageUrl={profile_picture} size={28}/>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-[var(--text)] truncate">{fullName || '—'}</p>
             <p className="text-xs text-[var(--text2)] truncate">{user.email ?? ''}</p>
@@ -100,17 +127,19 @@ export function AvatarMenu({ onNavigate, avatarOnly = false }: AvatarMenuProps) 
 
           <div className="my-1 h-px bg-[var(--border)]" />
 
+          {logoutError && (
+            <div className="px-2 py-1.5 mb-1 text-xs text-red-500 bg-red-500/10 rounded">
+              {logoutError}
+            </div>
+          )}
+
           <button
-            onClick={async () => {
-              setOpen(false);
-              onNavigate?.();
-              await signOut();
-              navigate('/', { replace: true });
-            }}
-            className="menu-item text-red-500 hover:bg-red-500/10"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="menu-item text-red-500 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
             role="menuitem"
           >
-            Log Out
+            {isLoggingOut ? 'Logging out...' : 'Log Out'}
           </button>
         </div>
       </div>

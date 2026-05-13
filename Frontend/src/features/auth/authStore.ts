@@ -1,6 +1,7 @@
-import { create } from "zustand";
+import { queryClient } from '@/lib/react-query';
 import { supabase } from "@/lib/supabase";
-import type { User, Session, AuthResponse } from "@supabase/supabase-js";
+import type { AuthResponse, Session, User } from "@supabase/supabase-js";
+import { create } from "zustand";
 
 export type AuthStatus =
   | "loading"
@@ -113,14 +114,34 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   // ================= SIGN OUT =================
   signOut: async () => {
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
 
-    set({
-      user: null,
-      session: null,
-      accessToken: null,
-      status: "anonymous",
-    });
+      if (error) {
+        throw error;
+      }
+
+      // Reset store state
+      set({
+        user: null,
+        session: null,
+        accessToken: null,
+        status: "anonymous",
+      });
+
+      // Clear React Query cache
+      queryClient.clear();
+    } catch (error) {
+      // Reset store state even if signOut fails
+      set({
+        user: null,
+        session: null,
+        accessToken: null,
+        status: "anonymous",
+      });
+      queryClient.clear();
+      throw error;
+    }
   },
 
   // ================= INIT (SOURCE OF TRUTH) =================
@@ -142,6 +163,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+  //      if (event === "SIGNED_OUT") {
+  //     // 1. clear zustand
+  //     useAuthStore.getState().logout();
+
+  //   // 2. clear react-query cache
+  //   queryClient.clear();
+  // }
+
+  // if (event === "SIGNED_IN") {
+  //   useAuthStore.getState().setSession(session);
+  // }
       set({
         session,
         user: session?.user ?? null,

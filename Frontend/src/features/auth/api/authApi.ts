@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { useAuthStore } from '../authStore';
 import { SyncUserPayload, User } from '../types';
-const AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
+const BASE_URL = import.meta.env.VITE_BASE_URL
 
 
 const authApi = axios.create({
-    baseURL:AUTH_BASE_URL,
+    baseURL:`${BASE_URL}/auth`,
     headers:{
         'Content-Type':"application/json"
     },
@@ -27,11 +27,13 @@ authApi.interceptors.request.use((config)=>{
 }
 )
 
+//sync-user endpoint
 export const sync_user = async (payload:SyncUserPayload): Promise<User> => {
     const {data} = await authApi.post<User>("/sync-user", payload)
     return data
 }
 
+//user profile endpoint
 export const get_user_profile = async(): Promise<User> =>{
     const {data} = await authApi.get<User>("/profile")
     return data

@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { get_user_profile } from '@/features/auth/api/authApi';
-import { useQueryClient } from '@tanstack/react-query';
+import {queryClient} from '@/lib/react-query'
 
 
 const DASHBOARD: Record<Role, string> = {
@@ -19,7 +19,6 @@ const DASHBOARD: Record<Role, string> = {
 export function LoginPage() {
   const {signIn, signInWithGoogle} = useAuthStore()
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [authError, setAuthError] = useState<string>('');
 
   const formik = useFormik({
