@@ -8,7 +8,7 @@ import { Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { get_user_profile } from '@/features/auth/api/authApi';
+import { get_me } from '@/features/auth/api/authApi';
 import {queryClient} from '@/lib/react-query'
 
 
@@ -30,7 +30,7 @@ export function LoginPage() {
     try {
       await signIn(values.email, values.password);
 
-      const profile = await get_user_profile();
+      const profile = await get_me();
       console.log(profile)
 
       queryClient.setQueryData(["profile"], profile);

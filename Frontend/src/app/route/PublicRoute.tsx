@@ -1,18 +1,18 @@
-import { useGetProfile } from '@/features/auth/hooks/useAuthApi';
+import { useGetMe } from '@/features/auth/hooks/useAuthApi';
 import Authloader from '@/shared/components/ui/AuthLoader';
 import { Navigate, Outlet } from 'react-router-dom';
 
 const PublicRoute = () => {
-  const { user, isLoading } = useGetProfile();
+  const { me, isLoading } = useGetMe();
 
   if (isLoading) {
     return <Authloader />;
   }
 
-  if (user) {
+  if (me) {
     return (
       <Navigate
-        to={`/${user.role}/dashboard`}
+        to={`/${me.role}/dashboard`}
         replace
       />
     );

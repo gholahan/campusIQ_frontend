@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../authStore';
-import { SyncUserPayload, User } from '../types';
+import { MeResponse, SyncUserPayload, User } from '../types';
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
 
@@ -36,5 +36,10 @@ export const sync_user = async (payload:SyncUserPayload): Promise<User> => {
 //user profile endpoint
 export const get_user_profile = async(): Promise<User> =>{
     const {data} = await authApi.get<User>("/profile")
+    return data
+}
+
+export const get_me = async(): Promise<MeResponse> =>{
+    const {data} = await authApi.get<MeResponse>("/me")
     return data
 }

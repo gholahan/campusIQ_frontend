@@ -1,20 +1,16 @@
-import { useAuthStore } from '@/features/auth/authStore'
-import { useEffect, useRef } from 'react'
-
+import { useAuthStore } from '@/features/auth/authStore';
+import { useEffect, useRef } from 'react';
 
 export function AuthInitializer({ children }: { children: React.ReactNode }) {
-  const initialize = useAuthStore((s) => s.initialize)
-  const initializedRef = useRef(false)
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    // prevent double init in StrictMode
-    if (initializedRef.current) return
-    initializedRef.current = true
+    if (initializedRef.current) return;
+    initializedRef.current = true;
 
-    const cleanup = initialize()
-    return cleanup
-  }, [initialize])
+    const cleanup = useAuthStore.getState().initialize();
+    return cleanup;
+  }, []);
 
-  return <>{children}</>
+  return <>{children}</>;
 }
-

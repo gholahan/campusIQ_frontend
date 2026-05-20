@@ -19,3 +19,10 @@ export interface User {
   updated_at: string; // ISO date string
   last_seen_at: string | null;
 }
+
+export interface MeResponse {
+  id: string;
+  email: string;
+  role: Role;
+  onboarding_complete: boolean;
+}
