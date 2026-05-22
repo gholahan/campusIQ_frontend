@@ -2,7 +2,7 @@ import { useGetProfile } from "@/features/auth/hooks/useAuthApi";
 import { initialValues, profileFormValidation } from "@/shared/lib/validation/profileOnboarding";
 import { useFormik } from "formik";
 import { useState } from "react";
-import { useTutorProfileApi } from "@/features/tutor/hooks/useTutorApi";
+import { useCreateTutorProfile } from "@/features/tutor/hooks/useTutorApi";
 import { buildPayload } from "../../features/tutor/utils/payload";
 import { StepHeader } from "../../features/tutor/components/StepHeader";
 import { StepNavigation } from "../../features/tutor/components/StepNavigation";
@@ -17,7 +17,7 @@ const TOTAL_STEPS = 4;
 
 export default function TutorProfileForm() {
   const { user } = useGetProfile();
-  const { createTutorAsync, isPending, isError, error: mutationError } = useTutorProfileApi();
+  const { createTutorAsync, isPending, isError, error: mutationError } = useCreateTutorProfile();
 
   const [courseInput, setCourseInput] = useState("");
 

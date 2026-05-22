@@ -8,6 +8,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Missing Supabase environment variables")
 }
 
-export const supabase = createClient(supabaseUrl,supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-
+// log token for debugging
+supabase.auth.getSession().then(({ data }) => {
+  console.log("access_token:", data.session?.access_token ?? "no session")
+})

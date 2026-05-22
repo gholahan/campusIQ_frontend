@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Avatar, Stars } from '@/shared/components/ui';
 import { useGetProfile } from '@/features/auth/hooks/useAuthApi';
+import { useGetTutorProfile } from '@/features/tutor/hooks/useTutorApi';
 
 const REQUESTS = [
   { name: 'Sam Okafor',   course: 'Data Structures', topic: 'Binary search trees',       time: '10 min ago', color: 'var(--accent)' },
@@ -16,10 +17,10 @@ const SESSIONS = [
 
 export function TutorDashboard() {
   const navigate = useNavigate();
-  const {user} = useGetProfile()
+  const {tutor} = useGetTutorProfile()
   return (
     <div className="page-enter">
-      <div className="mb-7"><h1 className="font-display text-[26px] font-extrabold mb-1 tracking-[-0.5px] text-[var(--text)]">Tutor Dashboard</h1><p className="text-[var(--text2)] text-sm">Welcome back, {user?.first_name} Here's your activity overview.</p></div>
+      <div className="mb-7"><h1 className="font-display text-[26px] font-extrabold mb-1 tracking-[-0.5px] text-[var(--text)]">Tutor Dashboard</h1><p className="text-[var(--text2)] text-sm">Welcome back, {tutor?.full_name} Here's your activity overview.</p></div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
         {[{ label: 'Sessions This Week', value: 8, icon: '📅', color: 'blue', change: '↑ 2 from last week' },{ label: 'Pending Requests', value: 3, icon: '📨', color: 'orange', change: '3 awaiting response' },{ label: 'Total Earnings', value: '$240', icon: '💰', color: 'green', change: '↑ $40 this week' },{ label: 'Rating', value: '4.9', icon: '⭐', color: 'purple', change: 'From 47 reviews' }].map((s) => (
           <div key={s.label} className={`stat-card ${s.color}`}><div className="text-[22px] mb-3">{s.icon}</div><div className="font-display text-[28px] font-extrabold mb-1">{s.value}</div><div className="text-[13px] text-[var(--text2)]">{s.label}</div><div className="text-[12px] mt-1.5 text-[var(--cgreen)]">{s.change}</div></div>

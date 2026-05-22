@@ -55,24 +55,25 @@ export interface TutorProfilePayload {
 
 export interface TutorProfileRead {
   user_id: string;
-
   full_name: string;
-
   title: string | null;
-
   bio: string;
-
-  hourly_rate: string | number | null; // Decimal comes as string from backend
-
+  hourly_rate: string | number | null;
   availability: AvailabilityMap | null;
-
   is_online: boolean;
-
-  average_rating: string | number; // Decimal
-
+  average_rating: string | number;
   review_count: number;
-
   total_sessions: number;
-
   courses: CourseRead[];
+
+  profile_picture_url: string | null;
+}
+
+export interface TutorProfileUpdatePayload {
+  profile_picture_url?: string;
+  title?: string;
+  bio?: string;
+  hourly_rate?: number;
+  availability?: AvailabilityMap;
+  courses?: string[];
 }

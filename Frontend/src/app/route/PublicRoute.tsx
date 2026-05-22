@@ -10,12 +10,11 @@ const PublicRoute = () => {
   }
 
   if (me) {
-    return (
-      <Navigate
-        to={`/${me.role}/dashboard`}
-        replace
-      />
-    );
+    const destination =
+      me.role === 'tutor' && !me.onboarding_complete
+        ? '/tutor/onboarding'
+        : `/${me.role}/dashboard`;
+    return <Navigate to={destination} replace />;
   }
 
   return <Outlet />;

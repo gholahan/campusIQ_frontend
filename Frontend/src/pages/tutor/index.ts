@@ -1,3 +1,4 @@
-export { TutorDashboard }   from './TutorDashboard';
-export { TutorProfileEdit } from './TutorProfileEdit';
-export { TutorChat }        from './TutorChat';
+export { TutorChat } from './TutorChat';
+export { TutorDashboard } from './TutorDashboard';
+export { TutorProfileEdit } from './TutorProfile';
+

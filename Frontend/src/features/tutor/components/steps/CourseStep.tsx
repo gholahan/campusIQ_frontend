@@ -12,6 +12,7 @@ interface CoursesStepProps {
   onRemoveCourse: (c: string) => void;
   error?: string;
   touched?: boolean;
+  showPresets?: boolean;
 }
 
 export function CoursesStep({
@@ -23,6 +24,7 @@ export function CoursesStep({
   onRemoveCourse,
   error,
   touched,
+  showPresets = true,
 }: CoursesStepProps) {
   const customCourses = courses.filter(
     (c) => !PRESET_COURSES.includes(c)
@@ -37,13 +39,13 @@ export function CoursesStep({
             Course catalogue
           </p>
 
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          {showPresets && <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
             Select from presets or add your own.
-          </p>
+          </p>}
         </div>
 
         {/* Preset chips */}
-        <div className="mb-6 max-h-52 overflow-y-auto rounded-xl border border-[var(--color-border-secondary)] p-3 flex flex-wrap gap-2">
+         {showPresets &&  <div className="mb-6 max-h-52 overflow-y-auto rounded-xl border border-[var(--color-border-secondary)] p-3 flex flex-wrap gap-2">
           {PRESET_COURSES.map((c) => {
             const active = courses.includes(c);
 
@@ -76,7 +78,7 @@ export function CoursesStep({
               </button>
             );
           })}
-        </div>
+        </div>}
 
         {/* Custom input */}
         <div>

@@ -15,7 +15,7 @@ import { TutorProfileView } from '@/pages/student/TutorProfileView';
 import { TutorSearch } from '@/pages/student/TutorSearch';
 import { TutorChat } from '@/pages/tutor/TutorChat';
 import { TutorDashboard } from '@/pages/tutor/TutorDashboard';
-import { TutorProfileEdit } from '@/pages/tutor/TutorProfileEdit';
+import { TutorProfileEdit } from '@/pages/tutor/TutorProfile';
 import TutorProfileForm from '@/pages/tutor/TutorProfileForm';
 import { AppShell } from '@/shared/components/layout';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -26,16 +26,14 @@ export function AppRoutes() {
   return (
     <Routes>
 
+      <Route path="auth/callback" element={<AuthCallback />} />
+
       {/* ───────── PUBLIC ───────── */}
       <Route element={<PublicRoute />}>
         <Route element={<AppShell />}>
           <Route index element={<LandingPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignupPage />} />
-          <Route
-            path="auth/callback"
-            element={<AuthCallback />}
-          />
         </Route>
       </Route>
 

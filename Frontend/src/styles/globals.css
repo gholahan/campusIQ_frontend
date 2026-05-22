@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+  @keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 @theme {
   --font-sans:    'DM Sans', sans-serif;
   --font-display: 'Syne', sans-serif;
@@ -62,6 +71,26 @@
   --border:  #E2E8F0; --border2: #CBD5E1;
   --text:    #0F172A; --text2:   #475569; --text3:   #94A3B8;
   --cgreen:  #10B981; --corange: #F59E0B; --cpurple: #8B5CF6; --cred: #EF4444;
+}
+
+.skeleton {
+  background: linear-gradient(to right, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 0.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .skeleton {
+    background: linear-gradient(to right, #1a2035 0%, #252d45 50%, #1a2035 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+}
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(to right, #1a2035 0%, #252d45 50%, #1a2035 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
 }
 
 /* ── Base ── */
@@ -294,10 +323,6 @@ body::before {
   }
 }
 
-/* ── Dark mode — system preference ──────────────────────────
-   Swaps every token back to the original dark navy palette.
-   Zero JSX changes needed — all components use var(--token).
-
 /* ── Dark mode ───────────────────────────────────────────────
    Triggered by EITHER:
    • System OS preference  (prefers-color-scheme: dark)
@@ -393,7 +418,6 @@ body::before {
     }
   }
 }
-[data-theme="dark"] body::before,
 [data-theme="dark"] body::before {
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(79,126,248,0.06) 0%, transparent 60%),
@@ -407,7 +431,7 @@ body::before {
   :root:not([data-theme="light"]) .card { box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
   :root:not([data-theme="light"]) .tutor-card:hover { box-shadow: 0 4px 20px rgba(79,126,248,0.15); }
 }
-[data-theme="dark"] .navbar    { background: rgba(5, 76, 243, 0.85); }
+[data-theme="dark"] .navbar    { background: rgba(10,13,20,0.85); }
 [data-theme="dark"] .floating-pill { background: rgba(17, 21, 32, 0.72); border-color: rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06); }
 [data-theme="dark"] .card      { box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
 [data-theme="dark"] .tutor-card:hover { box-shadow: 0 4px 20px rgba(79,126,248,0.15); }
