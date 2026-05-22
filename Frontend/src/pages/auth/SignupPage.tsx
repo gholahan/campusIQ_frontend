@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 
 import type { Role } from '@/shared/types';
 
-import {signupSchema, signupInitialValues,} from '@/shared/lib/validation/signupSchema';
+import { signupSchema, signupInitialValues } from '@/shared/lib/validation/signupSchema';
 
 import { FieldError } from '@/shared/components/ui';
 import { fieldClass } from '@/shared/lib/fieldClass';
@@ -12,22 +12,20 @@ import { useAuthStore } from '@/features/auth/authStore';
 import { FcGoogle } from 'react-icons/fc';
 import { GraduationCap, BookOpen } from 'lucide-react';
 import { useSyncUser } from '@/features/auth/hooks/useAuthApi';
-
-// Key used across SignupPage + AuthCallback
+import { queryClient } from '@/lib/react-query';
+import { PiEyeLight, PiEyeSlashLight } from 'react-icons/pi';
 export const PENDING_ROLE_KEY = 'campusiq_pending_role';
 
 export function SignupPage() {
   const { syncUserAsync } = useSyncUser();
-  const status = useAuthStore(s => s.status);
   const navigate = useNavigate();
   const { signUp, signInWithGoogle } = useAuthStore();
   const [authError, setAuthError] = useState<string>('');
   const [roleError, setRoleError] = useState<string>('');
   const [role, setRole] = useState<Role | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const isTutor = role === 'tutor';
-
-  // ── Persist role to localStorage whenever the user picks one ──────────────
   const handleRoleSelect = (r: Role) => {
     setRole(r);
     setRoleError('');
@@ -37,10 +35,9 @@ export function SignupPage() {
 
   const formik = useFormik({
     initialValues: signupInitialValues,
-    validationSchema: signupSchema(isTutor),
+    validationSchema: signupSchema(),
 
     onSubmit: async (values) => {
-      console.log(values)
       if (!role) {
         setRoleError('Please select a role before continuing.');
         return;
@@ -50,20 +47,23 @@ export function SignupPage() {
         const res = await signUp(values.email, values.password);
         console.log('res:', res);
 
-        const syncedUser  = await syncUserAsync({
+        // cancel any /me or /profile queries that fired the moment the
+        // token was set — the user doesn't exist in the backend yet
+        await queryClient.cancelQueries({ queryKey: ["me"] });
+        await queryClient.cancelQueries({ queryKey: ["profile"] });
+        queryClient.removeQueries({ queryKey: ["me"] });
+        queryClient.removeQueries({ queryKey: ["profile"] });
+
+        const syncedUser = await syncUserAsync({
           role,
           first_name: values.firstName,
           last_name: values.lastName,
         });
 
-        // Role consumed — clean up
+        // now the user exists — let queries run fresh
+        await queryClient.invalidateQueries({ queryKey: ["me"] });
+
         localStorage.removeItem(PENDING_ROLE_KEY);
-
-        const coursesArray = values.courses
-          ?.split(',')
-          .map((c) => c.trim())
-          .filter(Boolean);
-
         navigate(`/${syncedUser.role}/dashboard`);
       } catch (err: any) {
         setAuthError(err.message || 'Signup failed');
@@ -71,25 +71,22 @@ export function SignupPage() {
     },
   });
 
-  // ── Google sign-in: guard role, then delegate rest to AuthCallback ─────────
-  const handleGoogleSignIn = () => {
-    if (!role) {
-      setRoleError('Please select a role before continuing with Google.');
-      return;
-    }
-    // Role is already in localStorage from handleRoleSelect.
-    // AuthCallback will read it, call syncUserAsync, then navigate.
-    signInWithGoogle();
-  };
-
   const err = (f: keyof typeof formik.errors) =>
     formik.touched[f] ? formik.errors[f] : undefined;
 
   const lbl = 'block text-[13px] font-medium text-[var(--text2)] mb-1.5';
 
-  if (status === 'verification_pending') {
-    return <div>Check your email to verify your account.</div>;
-  }
+  const handleGoogleSignIn = () => {
+    if (!role) {
+      setRoleError('Please select a role before continuing with Google.');
+      return;
+    }
+    signInWithGoogle();
+  };
+
+  // if (status === 'verification_pending') {
+  //   return <div>Check your email to verify your account.</div>;
+  // }
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-4 py-6 overflow-hidden">
@@ -106,7 +103,8 @@ export function SignupPage() {
       >
         {/* SCROLL AREA */}
         <div className="overflow-y-auto px-5 sm:px-6 py-6">
-          {/* TOP */}
+
+          {/* HEADER */}
           <div className="mb-6">
             <div
               className="
@@ -123,17 +121,14 @@ export function SignupPage() {
             <h1 className="text-[28px] font-bold tracking-[-1px] text-[var(--text)] mb-1">
               Create account
             </h1>
-
             <p className="text-sm text-[var(--text2)]">
               Join CampusIQ and start learning smarter.
             </p>
           </div>
 
-          {/* ROLE */}
+          {/* ROLE PICKER */}
           <div className="mb-6">
-            <p className="text-[13px] font-medium text-[var(--text2)] mb-2">
-              Continue as
-            </p>
+            <p className="text-[13px] font-medium text-[var(--text2)] mb-2">Continue as</p>
 
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -164,10 +159,7 @@ export function SignupPage() {
                   >
                     <Icon size={18} />
                   </div>
-
-                  <div className="text-sm font-semibold text-[var(--text)]">
-                    {label}
-                  </div>
+                  <div className="text-sm font-semibold text-[var(--text)]">{label}</div>
                 </button>
               ))}
             </div>
@@ -175,22 +167,21 @@ export function SignupPage() {
 
           {/* FORM */}
           <form onSubmit={formik.handleSubmit}>
+
             {/* NAMES */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div>
                 <label className={lbl}>First Name</label>
                 <input
-                  placeholder="Amara"
                   className={fieldClass(formik.touched.firstName, formik.errors.firstName)}
                   {...formik.getFieldProps('firstName')}
                 />
                 <FieldError message={err('firstName')} />
               </div>
 
-              <div className="mb-4">
+              <div>
                 <label className={lbl}>Last Name</label>
                 <input
-                  placeholder="Osei"
                   className={fieldClass(formik.touched.lastName, formik.errors.lastName)}
                   {...formik.getFieldProps('lastName')}
                 />
@@ -213,45 +204,48 @@ export function SignupPage() {
             {/* PASSWORD */}
             <div className="mb-4">
               <label className={lbl}>Password</label>
-              <input
-                type="password"
-                placeholder="Minimum 8 characters"
-                className={fieldClass(formik.touched.password, formik.errors.password)}
-                {...formik.getFieldProps('password')}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Minimum 8 characters"
+                  className={fieldClass(formik.touched.password, formik.errors.password)}
+                  {...formik.getFieldProps('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text3)] hover:text-[var(--text2)] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <PiEyeSlashLight size={18} /> : <PiEyeLight size={18} />}
+                </button>
+              </div>
               <FieldError message={err('password')} />
             </div>
 
-            {/* CONFIRM */}
+            {/* CONFIRM PASSWORD */}
             <div className="mb-4">
               <label className={lbl}>Confirm Password</label>
-              <input
-                type="password"
-                placeholder="Repeat password"
-                className={fieldClass(
-                  formik.touched.confirmPassword,
-                  formik.errors.confirmPassword,
-                )}
-                {...formik.getFieldProps('confirmPassword')}
-              />
+              <div className="relative">
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  placeholder="Repeat password"
+                  className={fieldClass(formik.touched.confirmPassword, formik.errors.confirmPassword)}
+                  {...formik.getFieldProps('confirmPassword')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text3)] hover:text-[var(--text2)] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirm ? <PiEyeSlashLight size={18} /> : <PiEyeLight size={18} />}
+                </button>
+              </div>
               <FieldError message={err('confirmPassword')} />
             </div>
 
-            {/* TUTOR COURSES */}
-            {isTutor && (
-              <div className="mb-0.5">
-                <label className={lbl}>Courses You Teach</label>
-                <input
-                  placeholder="Data Structures, Algorithms..."
-                  className={fieldClass(formik.touched.courses, formik.errors.courses)}
-                  {...formik.getFieldProps('courses')}
-                />
-                <FieldError message={err('courses')} />
-              </div>
-            )}
-
-            {isTutor &&<p className='mb-5 text-red-500 text-sm'> Note courses should be seperated by comma </p>}
-
+            {/* AUTH ERROR */}
             {authError && (
               <div className="mb-4 text-red-500 text-sm">{authError}</div>
             )}
@@ -261,13 +255,17 @@ export function SignupPage() {
               type="submit"
               disabled={formik.isSubmitting}
               className="
-                  btn-primary w-full justify-center py-3
-                  text-[15px] font-bold disabled:opacity-50 
-                  transition-colors disabled:cursor-not-allowed"
-             >
-              {formik.isSubmitting ? 'Creating Account...' : 'Create Account'}
+                btn-primary w-full justify-center py-3
+                text-[15px] font-bold disabled:opacity-50
+                transition-colors disabled:cursor-not-allowed
+              "
+            >
+              {formik.isSubmitting ? 'Creating Account…' : 'Create Account'}
             </button>
           </form>
+          {roleError && (
+              <p className="mt-2 text-sm text-red-500">{roleError}</p>
+            )}
 
           {/* DIVIDER */}
           <div className="flex items-center gap-3 my-5">
@@ -277,10 +275,6 @@ export function SignupPage() {
           </div>
 
           {/* GOOGLE */}
-          {/* Role error shown under the role picker — visible for both paths */}
-            {roleError && (
-              <p className="mb-2 text-sm text-red-500">{roleError}</p>
-            )}
           <button
             onClick={handleGoogleSignIn}
             type="button"
@@ -305,7 +299,7 @@ export function SignupPage() {
             </a>
           </p>
 
-          {/* LOGIN */}
+          {/* LOGIN LINK */}
           <div className="text-center text-sm text-[var(--text2)] mt-5">
             Already have an account?{' '}
             <button
@@ -315,6 +309,7 @@ export function SignupPage() {
               Sign in
             </button>
           </div>
+
         </div>
       </div>
     </div>

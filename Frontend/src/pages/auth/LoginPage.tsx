@@ -8,6 +8,7 @@ import { Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
+import { PiEyeLight, PiEyeSlashLight } from 'react-icons/pi';
 import { get_me } from '@/features/auth/api/authApi';
 import {queryClient} from '@/lib/react-query'
 
@@ -20,6 +21,7 @@ export function LoginPage() {
   const {signIn, signInWithGoogle} = useAuthStore()
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: loginInitialValues,
@@ -73,7 +75,22 @@ export function LoginPage() {
 
         <div className="mb-4">
           <label className="block text-[13px] font-semibold text-(--text2) mb-1.5">Password</label>
-          <input type="password" placeholder="Your password" className={fieldClass(formik.touched.password, formik.errors.password)} {...formik.getFieldProps('password')} />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Your password"
+              className={fieldClass(formik.touched.password, formik.errors.password)}
+              {...formik.getFieldProps('password')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text3)] hover:text-[var(--text2)] transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? <PiEyeSlashLight size={18} /> : <PiEyeLight size={18} />}
+            </button>
+          </div>
           <FieldError message={formik.touched.password ? formik.errors.password : undefined} />
         </div>
 
