@@ -26,16 +26,14 @@ export function AppRoutes() {
   return (
     <Routes>
 
+      <Route path="auth/callback" element={<AuthCallback />} />
+
       {/* ───────── PUBLIC ───────── */}
       <Route element={<PublicRoute />}>
         <Route element={<AppShell />}>
           <Route index element={<LandingPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignupPage />} />
-          <Route
-            path="auth/callback"
-            element={<AuthCallback />}
-          />
         </Route>
       </Route>
 
