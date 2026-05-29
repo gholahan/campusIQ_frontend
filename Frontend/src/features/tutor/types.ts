@@ -69,6 +69,30 @@ export interface TutorProfileRead {
   profile_picture_url: string | null;
 }
 
+export type TutorSearchParams = {
+  q?: string; // global search
+
+  name?: string;
+  course?: string;
+
+  is_online?: boolean;
+
+  min_rate?: number;
+  max_rate?: number;
+  min_rating?: number;
+
+  order_by?: "average_rating" | "hourly_rate";
+  order_dir?: "asc" | "desc";
+
+  offset?: number;
+  limit?: number;
+};
+
+export type TutorSearchResult = {
+  total: number;
+  tutors: TutorProfileRead[];
+};
+
 export interface TutorProfileUpdatePayload {
   profile_picture_url?: string;
   title?: string;

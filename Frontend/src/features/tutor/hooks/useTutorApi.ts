@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createTutorProfile, get_tutor_profile, update_tutor_profile } from "../tutorApi";
-import { TutorProfilePayload, TutorProfileRead, TutorProfileUpdatePayload } from "../types";
+import { createTutorProfile, get_tutor_profile, update_tutor_profile, get_search_tutor } from "../tutorApi";
+import { TutorProfilePayload, TutorProfileRead, TutorProfileUpdatePayload, TutorSearchParams, TutorSearchResult } from "../types";
 import { queryClient } from "@/lib/react-query";
 import { useAuthStore } from "@/features/auth";
 
@@ -68,6 +68,24 @@ export const useUpdateTutorProfile = () => {
   return {
     ...mutation,
     updateAsync: mutation.mutateAsync,
+  };
+};
+
+export const useSearchTutors = (params: TutorSearchParams) => {
+  const accessToken = useAuthStore(s => s.accessToken);
+  const { data, isLoading, isFetching, error } = useQuery<TutorSearchResult, Error>({
+    queryKey: ["tutor-search", params],
+    queryFn: () => get_search_tutor(params),
+    enabled: !!accessToken,
+    staleTime: 1000 * 30,
+    placeholderData: (prev) => prev,
+  });
+  return {
+    tutors: data?.tutors ?? [],
+    total: data?.total ?? 0,
+    isLoading,
+    isFetching,
+    error,
   };
 };
 
