@@ -99,7 +99,9 @@
 }
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; margin: 0; }
-h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; }
+h1, h2, h3, h4, h5 {
+  font-family: 'Source Sans 3', sans-serif;
+}
 a { text-decoration: none; color: inherit; }
 button { font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; outline: none; }
 input, textarea, select { font-family: 'DM Sans', sans-serif; outline: none; }

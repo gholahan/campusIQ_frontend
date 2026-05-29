@@ -43,16 +43,6 @@ export interface CourseRead {
 // the final API availability shape
 export type AvailabilityMap = Partial<Record<FullDayKey, DayWindow>>;
 
-// the full API payload
-export interface TutorProfilePayload {
-  name: string;
-  title: string;
-  bio: string;
-  hourly_rate: number;
-  availability: AvailabilityMap;
-  courses: string[];
-}
-
 export interface TutorProfileRead {
   user_id: string;
   full_name: string;
@@ -67,6 +57,16 @@ export interface TutorProfileRead {
   courses: CourseRead[];
 
   profile_picture_url: string | null;
+}
+
+//payload 
+export interface TutorProfilePayload {
+  name: string;
+  title: string;
+  bio: string;
+  hourly_rate: number;
+  availability: AvailabilityMap;
+  courses: string[];
 }
 
 export type TutorSearchParams = {

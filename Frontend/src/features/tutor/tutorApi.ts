@@ -50,3 +50,8 @@ export const get_search_tutor = async(params?: TutorSearchParams): Promise<Tutor
     const {data} = await tutorApi.get<TutorSearchResult>("/search", { params })
     return data
 }
+
+export const get_tutor_by_id = async(id: string): Promise<TutorProfileRead> => {
+    const {data} = await tutorApi.get<TutorProfileRead>(`/${id}`)
+    return data
+}

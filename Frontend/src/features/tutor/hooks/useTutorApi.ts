@@ -1,8 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createTutorProfile, get_tutor_profile, update_tutor_profile, get_search_tutor } from "../tutorApi";
-import { TutorProfilePayload, TutorProfileRead, TutorProfileUpdatePayload, TutorSearchParams, TutorSearchResult } from "../types";
-import { queryClient } from "@/lib/react-query";
 import { useAuthStore } from "@/features/auth";
+import { queryClient } from "@/lib/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
+import { createTutorProfile, get_search_tutor, get_tutor_by_id, get_tutor_profile, update_tutor_profile } from "../tutorApi";
+import { TutorProfilePayload, TutorProfileRead, TutorProfileUpdatePayload, TutorSearchParams, TutorSearchResult } from "../types";
 
 export const useCreateTutorProfile = () => {
   const mutation = useMutation<any, Error, TutorProfilePayload>({
@@ -89,3 +90,40 @@ export const useSearchTutors = (params: TutorSearchParams) => {
   };
 };
 
+export const tutorKey = (id: string) => ["tutor", id] as const;
+
+export function useTutorPrefetch() {
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeId = useRef<string | null>(null);
+
+  const prefetchTutor = (id: string) => {
+    activeId.current = id;
+
+    const existing = queryClient.getQueryData(tutorKey(id));
+    if (existing) return;
+
+    hoverTimeout.current = setTimeout(() => {
+      // 1. DATA PREFETCH
+      queryClient.prefetchQuery({
+        queryKey: tutorKey(id),
+        queryFn: () => get_tutor_by_id(id),
+        staleTime: 1000 * 60 * 10,
+      });
+
+      // 2. ROUTE PREFETCH (BIG UX BOOST)
+      import("@/pages/student/TutorProfileView")
+    }, 80);
+  };
+
+  const cancelPrefetch = (id?: string) => {
+    // only cancel if leaving same card
+    if (id && activeId.current !== id) return;
+
+    if (hoverTimeout.current) {
+      clearTimeout(hoverTimeout.current);
+      hoverTimeout.current = null;
+    }
+  };
+
+  return { prefetchTutor, cancelPrefetch };
+}

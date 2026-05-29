@@ -5,6 +5,7 @@ import { PRESET_COURSES } from '@/features/tutor/constants/courses';
 import { Avatar, Stars } from '@/shared/components/ui';
 import { Search, X, SlidersHorizontal, Wifi } from 'lucide-react';
 import { useDebounce } from '@/shared/hooks/useDebounce';
+import { useTutorPrefetch } from '@/features/tutor/hooks/useTutorApi';
 
 const COURSE_CHIPS = ['All', ...PRESET_COURSES];
 
@@ -33,7 +34,7 @@ const SORT_OPTIONS = [
 
 export function TutorSearch() {
   const navigate = useNavigate();
-
+  const{prefetchTutor, cancelPrefetch} = useTutorPrefetch();
   const [search, setSearch] = useState('');
   const [activeCourse, setActiveCourse] = useState('All');
   const [ratingIdx, setRatingIdx] = useState(0);
@@ -266,8 +267,10 @@ export function TutorSearch() {
           {tutors.map((t) => (
             <div
               key={t.user_id}
+              onMouseEnter={() => prefetchTutor(t.user_id)}
+              onMouseLeave={() => cancelPrefetch(t.user_id)}
+              onClick={() => navigate(`/student/tutors/${t.user_id}`)}
               className="tutor-card cursor-pointer"
-              onClick={() => navigate(`/tutors/${t.user_id}`)}
             >
               <div className="flex items-center gap-3 mb-3">
                 <Avatar name={t.full_name} imageUrl={t.profile_picture_url} size={46} />
