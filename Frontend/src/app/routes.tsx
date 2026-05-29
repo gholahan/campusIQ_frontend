@@ -19,8 +19,8 @@ import { TutorProfileEdit } from '@/pages/tutor/TutorProfile';
 import TutorProfileForm from '@/pages/tutor/TutorProfileForm';
 import { AppShell } from '@/shared/components/layout';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import ProtectedRoute from './route/ProtecteRoute';
-import PublicRoute from './route/PublicRoute';
+import ProtectedRoute from './Route/ProtecteRoute';
+import PublicRoute from './Route/PublicRoute';
 
 export function AppRoutes() {
   return (

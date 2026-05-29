@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TutorProfilePayload, TutorProfileRead, TutorProfileUpdatePayload } from "./types";
+import { TutorProfilePayload, TutorProfileRead, TutorProfileUpdatePayload, TutorSearchParams, TutorSearchResult } from "./types";
 import { useAuthStore } from "../auth";
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
@@ -43,5 +43,10 @@ export const get_tutor_profile = async(): Promise<TutorProfileRead> =>{
 
 export const update_tutor_profile = async(payload: TutorProfileUpdatePayload): Promise<TutorProfileRead> => {
     const {data} = await tutorApi.patch<TutorProfileRead>("/profile", payload)
+    return data
+}
+
+export const get_search_tutor = async(params?: TutorSearchParams): Promise<TutorSearchResult> => {
+    const {data} = await tutorApi.get<TutorSearchResult>("/search", { params })
     return data
 }
