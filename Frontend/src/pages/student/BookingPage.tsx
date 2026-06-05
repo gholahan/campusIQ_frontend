@@ -1,48 +1,80 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useFormik } from 'formik';
-import { TUTORS } from '@/shared/data/tutors';
-import { Avatar } from '@/shared/components/ui';
-import { FieldError } from '@/shared/components/ui';
-import { fieldClass } from '@/shared/lib/fieldClass';
-import { bookingSchema, bookingInitialValues } from '@/shared/lib/validation/bookingSchema';
-
+import { TutorProfileViewSkeleton } from '@/features/tutor/components/TutorProfileViewSkeleton';
+import { useCreateSession } from '@/features/tutor/hooks/useBooking';
+import { useGetTutorById } from '@/features/tutor/hooks/useTutorApi';
+import { Avatar, FieldError } from '@/shared/components/ui';
 import { Dropdown } from '@/shared/components/ui/DropDown';
+import { fieldClass } from '@/shared/lib/fieldClass';
+import { bookingInitialValues, bookingSchema } from '@/shared/lib/validation/bookingSchema';
+import { useFormik } from 'formik';
 
-const KEYS = ['Tutor', 'Duration', 'Time', 'Cost'] as const;
+import { useNavigate, useParams } from 'react-router-dom';
+
+const KEYS = ['Tutor', 'Duration', 'Slot', 'Cost', 'Total'] as const;
+
+// Convert availability map to displayable slots with day info
+function buildSlots(availability: Record<string, { start: string; end: string }> | null): Array<{ day: string; display: string }> {
+  if (!availability) return [];
+  return Object.entries(availability).map(
+    ([day, w]) => ({
+      day,
+      display: `${day.slice(0, 3)} ${w.start}–${w.end}`
+    })
+  );
+}
 
 export function BookingPage() {
   const navigate = useNavigate();
   const { tutorId } = useParams<{ tutorId: string }>();
-  const t = TUTORS.find((t) => t.id === Number(tutorId)) ?? TUTORS[0];
-  const slots = [...t.available, 'Mon 8am', 'Tue 2pm', 'Fri 11am'];
+  const { tutor, isLoading, error } = useGetTutorById(tutorId ?? '')
+  const { createSession, isPending } = useCreateSession();
+  const slots = buildSlots(tutor?.availability ?? null);
+  const courses = tutor?.courses.map((c) => c.name) ?? [];
 
   const formik = useFormik({
-    initialValues: { ...bookingInitialValues, subject: t.courses[0] },
+    enableReinitialize: true,
+    initialValues: { ...bookingInitialValues, subject: courses[0] ?? '' },
     validationSchema: bookingSchema,
-    onSubmit: (values) => {
-      console.log('[Booking] submitted:', {
-        tutor: t.name,
-        tutorId: t.id,
-        ...values,
-      });
+    onSubmit: async (values) => {
+      const selectedAvailability = values.scheduled_at && tutor?.availability?.[values.scheduled_at];
+      const cost = Number(tutor?.hourly_rate ?? 0) * Number(values.duration ?? 0);
+      
+      const payload = {
+        tutor_id: tutorId!,
+        subject: values.subject,
+        duration: values.duration,
+        cost,
+        scheduled_at: selectedAvailability ? { day: values.scheduled_at, ...selectedAvailability } : null,
+        notes: values.notes,
+      };
+      
+      await createSession(payload);
       navigate('/student/booking/confirmed');
     },
   });
 
+  if (isLoading) return <TutorProfileViewSkeleton />;
+  if (error || !tutorId) return <div>Failed to load tutor</div>;
+  if (!tutor) return <div>No tutor found</div>;
+
   const err = (field: keyof typeof formik.errors) =>
     formik.touched[field] ? (formik.errors[field] as string | undefined) : undefined;
+  
 
-  // Derive summary from current form values
-  const summary: Record<typeof KEYS[number], string> = {
-    Tutor:    t.name,
-    Duration: formik.values.duration,
-    Time:     formik.values.slot !== null ? (slots[formik.values.slot] ?? '—') : '—',
-    Cost:     `$${t.hourly}`,
+  const selectedSlotDisplay = slots.find(
+    s => s.day === formik.values.scheduled_at
+  )?.display ?? "—";
+
+  const summary: Record<(typeof KEYS)[number], string> = {
+  Tutor: tutor.full_name,
+  Duration: formik.values.duration === 1 ? '1 hour' : `${formik.values.duration} hours`,
+  Slot: formik.values.scheduled_at !== null ? selectedSlotDisplay : "—",
+  Cost: `$${Number(tutor.hourly_rate ?? 0)}/hr`,
+  Total: `$${Number(tutor.hourly_rate ?? 0) * (Number(formik.values.duration) ?? 0)}`
   };
 
   return (
     <div className="page-enter max-w-[600px]">
-      <button className="btn-ghost mb-5" onClick={() => navigate(`/student/tutors/${t.id}`)}>
+      <button className="btn-ghost mb-5" onClick={() => navigate(`/student/tutors/${tutorId}`)}>
         ← Back to Profile
       </button>
       <div className="mb-7">
@@ -53,52 +85,57 @@ export function BookingPage() {
       <div className="card p-7">
         {/* Tutor info strip */}
         <div className="flex gap-3 items-center mb-6 p-3.5 rounded-[10px]" style={{ background: 'var(--bg3)' }}>
-          <Avatar name={t.name} color={t.color} initials={t.initials} size={46} />
+          <Avatar name={tutor.full_name} imageUrl={tutor.profile_picture_url} size={46} />
           <div>
-            <div className="font-bold">{t.name}</div>
-            <div className="text-[13px] text-[var(--text2)]">{t.courses.join(', ')}</div>
-            <div className="text-[13px] text-[var(--accent2)] mt-0.5">${t.hourly}/hour</div>
+            <div className="font-bold">{tutor.full_name}</div>
+            <div className="text-[13px] text-[var(--text2)]">{courses.join(', ')}</div>
+            <div className="text-[13px] text-[var(--accent2)] mt-0.5">${Number(tutor.hourly_rate ?? 0)}/hr</div>
           </div>
         </div>
-
-        {/* Subject */}
 
         <Dropdown
           label="Subject / Topic"
           value={formik.values.subject}
-          options={t.courses}
+          options={courses}
           error={formik.touched.subject ? formik.errors.subject : undefined}
           touched={formik.touched.subject}
           placeholder="Select a subject"
           onChange={(v) => formik.setFieldValue('subject', v)}
         />
 
-        {/* Duration */}
         <Dropdown
           label="Session Duration"
-          value={formik.values.duration}
-          options={["1 hour", "1.5 hours", "2 hours"]}
-          error={formik.touched.duration ? formik.errors.duration : undefined}
+          value={String(formik.values.duration)}
+          options={[
+            { label: '1 hour', value: '1' },
+            { label: '1.5 hours', value: '1.5' },
+            { label: '2 hours', value: '2' },
+          ]}
+          error={formik.touched.duration ? (formik.errors.duration as string | undefined) : undefined}
           touched={formik.touched.duration}
           placeholder="Select a duration"
-          onChange={(v) => formik.setFieldValue('duration', v)}
+          onChange={(v) => formik.setFieldValue('duration', Number(v))}
         />
 
         {/* Time slot grid */}
         <div className="mb-4">
           <label className="block text-[13px] font-semibold text-[var(--text2)] mb-1.5">Select Time Slot</label>
-          <div className="grid grid-cols-3 gap-2 mb-2">
-            {slots.map((a, i) => (
-              <div
-                key={a}
-                className={`time-slot${formik.values.slot === i ? ' selected' : ''}`}
-                onClick={() => formik.setFieldValue('slot', i)}
-              >
-                {a}
-              </div>
-            ))}
-          </div>
-          <FieldError message={formik.touched.slot ? (formik.errors.slot as string | undefined) : undefined} />
+          {slots.length === 0 ? (
+            <p className="text-sm text-[var(--text2)]">No availability set by this tutor.</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              {slots.map(({ day, display }) => (
+                <div
+                  key={day}
+                  className={`time-slot${formik.values.scheduled_at === day ? ' selected' : ''}`}
+                  onClick={() => formik.setFieldValue('scheduled_at', day)}
+                >
+                  {display}
+                </div>
+              ))}
+            </div>
+          )}
+          <FieldError message={formik.touched.scheduled_at ? (formik.errors.scheduled_at as string | undefined) : undefined} />
         </div>
 
         {/* Notes */}
@@ -128,10 +165,11 @@ export function BookingPage() {
 
         <button
           type="button"
-          className="btn-primary w-full justify-center py-3 text-[15px] font-bold"
+          disabled={isPending}
+          className="btn-primary w-full justify-center py-3 text-[15px] font-bold disabled:opacity-60"
           onClick={() => formik.handleSubmit()}
         >
-          Confirm Booking →
+          {isPending ? 'Booking…' : 'Confirm Booking →'}
         </button>
       </div>
     </div>

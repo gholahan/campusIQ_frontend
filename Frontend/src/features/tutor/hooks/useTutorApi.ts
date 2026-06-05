@@ -90,6 +90,21 @@ export const useSearchTutors = (params: TutorSearchParams) => {
   };
 };
 
+export const useGetTutorById = (id:string) => {
+  const {data:tutor,isLoading,isFetching,error} = useQuery<TutorProfileRead, Error>({
+    queryKey:tutorKey(id),
+    queryFn:()=>get_tutor_by_id(id),
+    enabled: !!id,
+    staleTime:1000*60*30,
+  })
+
+  return{
+    tutor,
+    isLoading,
+    isFetching,
+    error
+  }
+}
 export const tutorKey = (id: string) => ["tutor", id] as const;
 
 export function useTutorPrefetch() {

@@ -14,7 +14,7 @@ export function BookingConfirmed() {
       </div>
       <h2 className="font-display text-[28px] font-extrabold mb-2 text-[var(--text)]">Session Booked!</h2>
       <p className="text-[var(--text2)] mb-6">
-        Your session has been confirmed. You'll receive a reminder 30 minutes before.
+        Your session request has been sent to the tutor. You'll receive a notification once they confirm.
       </p>
       <button className="btn-primary" onClick={() => navigate('/student/dashboard')}>
         Back to Dashboard

@@ -41,7 +41,7 @@ const LINKS: Record<Role, BottomNavLink[]> = {
     },
     {
       key: 'booking',
-      path: '/student/booking',
+      path: '/student/sessions',
       icon: CalendarDays,
       label: 'Sessions',
     },

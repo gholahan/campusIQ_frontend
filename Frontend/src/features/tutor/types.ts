@@ -101,3 +101,32 @@ export interface TutorProfileUpdatePayload {
   availability?: AvailabilityMap;
   courses?: string[];
 }
+
+export type ScheduledAt = {
+  day: string;
+  start: string;
+  end: string;
+};
+
+export type Session = {
+  id: string;
+  student_id: string;
+  tutor_id: string;
+  subject: string;
+  duration: number;
+  scheduled_at: ScheduledAt | null;
+  notes: string;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  cost: string; // backend sends big decimal as string
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateSessionPayload = {
+  tutor_id: string;
+  subject: string;
+  duration: number;
+  cost: number;
+  scheduled_at: ScheduledAt | null;
+  notes: string;
+};

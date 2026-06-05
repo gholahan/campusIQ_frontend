@@ -5,7 +5,8 @@ import { fieldClass } from '@/shared/lib/fieldClass';
 type Props = {
   label: string;
   value: string;
-  options: string[];
+  // options can be simple strings or objects with explicit labels/values
+  options: Array<string | { label: string; value: string }>;
   error?: string;
   touched?: boolean;
   placeholder?: string;
@@ -48,7 +49,11 @@ export function Dropdown({
         onClick={() => setOpen(o => !o)}
         className={fieldClass(touched, error)}
       >
-        <span>{value || placeholder}</span>
+        {(() => {
+          const found = options.find((opt) => (typeof opt === 'string' ? opt === value : opt.value === value));
+          const display = found ? (typeof found === 'string' ? found : found.label) : (value || placeholder);
+          return <span>{display}</span>;
+        })()}
 
         <ChevronDown size={16} className="ml-auto text-[var(--text3)]" />
       </button>
@@ -65,19 +70,23 @@ export function Dropdown({
             : "opacity-0 scale-95 pointer-events-none"}
         `}
       >
-        {options.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => {
-              onChange(opt);
-              setOpen(false);
-            }}
-            className="w-full text-left px-3 py-2 text-sm hover:bg-[var(--bg3)]"
-          >
-            {opt}
-          </button>
-        ))}
+        {options.map((opt) => {
+          const label = typeof opt === 'string' ? opt : opt.label;
+          const val = typeof opt === 'string' ? opt : opt.value;
+          return (
+            <button
+              key={val}
+              type="button"
+              onClick={() => {
+                onChange(val);
+                setOpen(false);
+              }}
+              className="w-full text-left px-3 py-2 text-sm hover:bg-[var(--bg3)]"
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
