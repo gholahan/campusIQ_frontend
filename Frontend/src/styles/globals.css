@@ -97,7 +97,7 @@
 *, *::before, *::after {
   box-sizing: border-box;
 }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; margin: 0; }
 h1, h2, h3, h4, h5 {
   font-family: 'Source Sans 3', sans-serif;

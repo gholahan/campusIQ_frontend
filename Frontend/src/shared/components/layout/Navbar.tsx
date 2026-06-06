@@ -1,9 +1,9 @@
 import { useTheme } from '@/shared/hooks/useTheme';
 import type { Role } from '@/shared/types';
+import { Moon, Sun } from 'lucide-react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AvatarMenu } from './AvatarMenu';
-import { Moon, Sun} from 'lucide-react';
-import { useState } from 'react';
 
 const NAV_LINKS: Record<Role, { label: string; path: string }[]> = {
   student: [

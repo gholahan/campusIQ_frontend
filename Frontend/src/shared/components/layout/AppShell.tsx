@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
+import { ScrollToTop } from '@/shared/components/ScrollToTop';
 
 export function AppShell({role,}: { role?: Role}) {
   return (
@@ -14,6 +15,7 @@ export function AppShell({role,}: { role?: Role}) {
         flex flex-col
       "
     >
+      <ScrollToTop />
       <Navbar />
 
       {role ? (
