@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../auth';
-import type { CreateSessionPayload, Session } from './types';
-
+import type { CreateSessionPayload, Session, SessionRead } from './types';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -19,9 +18,12 @@ bookingApi.interceptors.request.use((config) => {
   return config;
 });
 
-
-
-export const create_booking = async (payload: CreateSessionPayload): Promise<BookingRead> => {
+export const create_booking = async (payload: CreateSessionPayload): Promise<Session> => {
   const { data } = await bookingApi.post<Session>('/', payload);
+  return data;
+};
+
+export const get_sessions = async (): Promise<SessionRead[]> => {
+  const { data } = await bookingApi.get<SessionRead[]>('/');
   return data;
 };

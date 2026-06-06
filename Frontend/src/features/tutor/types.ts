@@ -102,11 +102,13 @@ export interface TutorProfileUpdatePayload {
   courses?: string[];
 }
 
-export type ScheduledAt = {
-  day: string;
-  start: string;
-  end: string;
-};
+export type SessionStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'completed'
+  | 'cancelled'
+  | 'no_show';
 
 export type Session = {
   id: string;
@@ -116,7 +118,7 @@ export type Session = {
   duration: number;
   scheduled_at: ScheduledAt | null;
   notes: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: SessionStatus;
   cost: string; // backend sends big decimal as string
   created_at: string;
   updated_at: string;
@@ -130,3 +132,27 @@ export type CreateSessionPayload = {
   scheduled_at: ScheduledAt | null;
   notes: string;
 };
+export interface ScheduledAt {
+  day: string;
+  start: string;
+  end: string;
+}
+
+export interface SessionTutor {
+  id: string;
+  full_name: string;
+  profile_picture_url: string | null;
+}
+
+
+export interface SessionRead {
+  id: string;
+  subject: string;
+  duration: number;
+  notes: string;
+  status: SessionStatus;
+  cost: number;
+  tutor: SessionTutor;
+  scheduled_at: ScheduledAt;
+  created_at: string;
+}

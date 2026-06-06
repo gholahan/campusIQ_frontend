@@ -11,6 +11,7 @@ const NAV_LINKS: Record<Role, { label: string; path: string }[]> = {
     { label: 'Find Tutors',  path: '/student/tutors'    },
     { label: 'AI Assistant', path: '/student/ai'        },
     { label: 'Chat',         path: '/student/chat'      },
+    { label: 'Session',       path: 'student/sessions'  }
   ],
   tutor: [
     { label: 'Dashboard', path: '/tutor/dashboard' },
@@ -46,15 +47,7 @@ export function Navbar() {
   return (
     <>
       {/* ── Main bar ── */}
-      <nav className="
-        sticky top-0 z-[100]
-        backdrop-blur-xl border-b
-        bg-[var(--bg2)]/90 border-[var(--border)]
-        px-4 sm:px-6 lg:px-8
-        h-14 sm:h-16 py-3
-        flex items-center justify-between
-        overflow-visible
-      ">
+      <nav className="navbar">
         {/* Brand */}
         <button
           onClick={() => { navigate('/'); closeMobile(); }}
@@ -75,15 +68,12 @@ export function Navbar() {
         </button>
 
         {/* ── Desktop nav ── */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="navbar-desktop hidden md:flex items-center gap-1">
           {links.map((l) => (
             <button
               key={l.path}
               onClick={() => navigate(l.path)}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all bg-transparent border-none cursor-pointer
-                ${isActive(l.path)
-                  ? 'text-[var(--accent2)] bg-[var(--accent)]/10'
-                  : 'text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)]'}`}
+              className={`navbar-link ${isActive(l.path) ? 'active' : ''}`}
             >
               {l.label}
             </button>
@@ -93,24 +83,14 @@ export function Navbar() {
   <>
     <button
       onClick={() => navigate('/login')}
-      className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all border-none cursor-pointer
-        ${
-          pathname === '/login'
-            ? 'text-[var(--accent2)] bg-[var(--accent)]/10'
-            : 'text-[var(--text2)] bg-transparent hover:text-[var(--text)] hover:bg-[var(--bg3)]'
-        }`}
+      className={`navbar-link ${pathname === '/login' ? 'active' : ''}`}
     >
       Log In
     </button>
 
     <button
       onClick={() => navigate('/signup')}
-      className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all border-none cursor-pointer
-        ${
-          pathname === '/signup'
-            ? 'text-[var(--accent2)] bg-[var(--accent)]/10'
-            : 'text-[var(--text2)] bg-transparent hover:text-[var(--text)] hover:bg-[var(--bg3)]'
-        }`}
+      className={`navbar-link ${pathname === '/signup' ? 'active' : ''}`}
     >
       Get Started
     </button>

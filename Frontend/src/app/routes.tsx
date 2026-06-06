@@ -81,7 +81,7 @@ export function AppRoutes() {
           />
 
           <Route
-            path="student/booking"
+            path="student/sessions"
             element={<BookedSessions />}
           />
         </Route>

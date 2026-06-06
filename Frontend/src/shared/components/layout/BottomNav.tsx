@@ -1,15 +1,15 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import type { Role, BottomNavLink } from '@/shared/types';
+import type { BottomNavLink, Role } from '@/shared/types';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import {
-  LayoutGrid,
-  Search,
-  Sparkles,
-  MessageSquare,
-  CalendarDays,
-  PencilLine,
-  Users,
-  ShieldAlert,
+    CalendarDays,
+    LayoutGrid,
+    MessageSquare,
+    PencilLine,
+    Search,
+    ShieldAlert,
+    Sparkles,
+    Users,
 } from 'lucide-react';
 
 const LINKS: Record<Role, BottomNavLink[]> = {
