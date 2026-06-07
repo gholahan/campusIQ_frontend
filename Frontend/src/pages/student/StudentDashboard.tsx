@@ -2,21 +2,37 @@ import { useGetProfile } from '@/features/auth/hooks/useAuthApi';
 import { STUDENT_TUTOR_CONVOS } from '@/features/chat/data/conversations';
 import { STATS } from '@/features/student/constants';
 import { useDashboardStats } from '@/features/student/useStudentApi';
+import { useGetSessions } from '@/features/tutor/hooks/useBooking';
 import { Avatar } from '@/shared/components/ui';
 import { useNavigate } from 'react-router-dom';
 import { StatCard } from './StatsCard';
 
-const SESSIONS = [
-  { title: 'Data Structures — Amara Osei', sub: 'Binary Trees & Recursion', time: 'Today, 4:00 PM', c: 'var(--cgreen)' },
-  { title: 'Calculus II — Chisom Nwosu',   sub: 'Integration by Parts',     time: 'Thu, 11:00 AM',  c: 'var(--accent)' },
-];
+function formatSessionSlot(scheduled_at?: { day: string; start: string; end: string }) {
+  if (!scheduled_at) return 'TBD';
+  return `${scheduled_at.day} · ${scheduled_at.start}–${scheduled_at.end}`;
+}
+
+function getSessionSortKey(session: { scheduled_at?: { day: string }; created_at: string }) {
+  if (session.scheduled_at?.day) {
+    const parsed = Date.parse(session.scheduled_at.day);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  const fallback = Date.parse(session.created_at);
+  return Number.isNaN(fallback) ? Number.POSITIVE_INFINITY : fallback;
+}
 
 export function StudentDashboard() {
   const navigate = useNavigate();
   const { user } = useGetProfile();
   const { stats } = useDashboardStats(user?.id);
+  const { sessions = [] } = useGetSessions();
 
   const summarySessions = stats?.sessions.this_week ?? 0;
+
+  const upcomingSessions = sessions
+    .filter((session) => ['pending', 'accepted'].includes(session.status))
+    .sort((a, b) => getSessionSortKey(a) - getSessionSortKey(b))
+    .slice(0, 3);
 
   const cards = STATS.map((stat) => {
     const value =
@@ -71,17 +87,30 @@ export function StudentDashboard() {
             <h2 className="font-display font-bold text-[17px] text-[var(--text)]">Upcoming Sessions</h2>
           </div>
           <div className="flex flex-col gap-2.5">
-            {SESSIONS.map((s, i) => (
-              <div key={i} className="session-card flex items-center min-h-[64px] overflow-hidden">
+            {upcomingSessions.length === 0 ? (
+              <div className="session-card flex items-center min-h-[64px] overflow-hidden">
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{s.title}</div>
-                  <div className="text-[12px] text-[var(--text2)] truncate">{s.sub}</div>
-                </div>
-                <div className="text-[12px] text-[var(--text3)] shrink-0">
-                  {s.time}
+                  <div className="font-semibold text-sm text-[var(--text)]">No upcoming sessions</div>
+                  <div className="text-[12px] text-[var(--text2)]">Check back once your booking is confirmed.</div>
                 </div>
               </div>
-            ))}
+            ) : (
+              upcomingSessions.map((session) => (
+                <div key={session.id} className="session-card flex items-center min-h-[64px] overflow-hidden">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">
+                      {session.subject} — {session.tutor.full_name}
+                    </div>
+                    <div className="text-[12px] text-[var(--text2)] truncate">
+                      {formatSessionSlot(session.scheduled_at)}
+                    </div>
+                  </div>
+                  <div className="text-[12px] text-[var(--text3)] shrink-0 capitalize">
+                    {session.status}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
         <div>
