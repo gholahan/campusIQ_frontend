@@ -15,7 +15,7 @@ export const STATS: StatCardTemplate[] = [
     showDelta: true,
   },
   {
-    label: 'AI Questions Asked',
+    label: 'AI Questions Asked this week',
     icon: '✦',
     color: 'purple',
     metric: 'ai',

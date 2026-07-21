@@ -97,6 +97,8 @@ export function BottomNav({ role }: { role: Role }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  if (pathname === '/student/ai') return null;
+
   const links = LINKS[role] ?? [];
 
   const isActive = (path: string) =>

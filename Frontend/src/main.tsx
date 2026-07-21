@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 import App from '@/app/App';
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@/lib/react-query'
+import "katex/dist/katex.min.css";
 
 createRoot(document.getElementById('root')!).render(
 

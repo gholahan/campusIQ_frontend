@@ -1,4 +1,4 @@
-export { AIAssistant } from './AIAssistant';
+
 export { BookingConfirmed } from './BookingConfirmed';
 export { BookingPage } from './BookingPage';
 export { StudentChat } from './StudentChat';

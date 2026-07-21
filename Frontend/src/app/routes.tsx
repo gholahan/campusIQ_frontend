@@ -5,7 +5,7 @@ import { AdminUsers } from '@/pages/admin/AdminUsers';
 import { AuthCallback } from '@/pages/auth/AuthCallback';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupPage } from '@/pages/auth/SignupPage';
-import { AIAssistant } from '@/pages/student/AIAssistant';
+import { AIAssistant } from '@/pages/ai/AIAssistant';
 import BookedSessions from '@/pages/student/BookedSessions';
 import { BookingConfirmed } from '@/pages/student/BookingConfirmed';
 import { BookingPage } from '@/pages/student/BookingPage';
