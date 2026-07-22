@@ -7,7 +7,9 @@ export const useDashboardStats = (studentId?: string) => {
     queryKey: ['dashboard-stats', studentId],
     queryFn: () => get_dashboard_stats(studentId!),
     enabled: !!studentId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 6000,
+    refetchInterval: 3000,
+    refetchOnWindowFocus:true
   });
   return { stats: data, isLoading };
 };

@@ -32,13 +32,13 @@ const LINKS: Record<Role, BottomNavLink[]> = {
       icon: Sparkles,
       label: 'AI',
     },
-    {
-      key: 'chat',
-      path: '/student/chat',
-      icon: MessageSquare,
-      label: 'Chat',
-      badge: 2,
-    },
+    // {
+    //   key: 'chat',
+    //   path: '/student/chat',
+    //   icon: MessageSquare,
+    //   label: 'Chat',
+    //   badge: 2,
+    // },
     {
       key: 'booking',
       path: '/student/sessions',

@@ -11,6 +11,7 @@ import { BioStep } from "../../features/tutor/components/steps/BioStep";
 import { CoursesStep } from "../../features/tutor/components/steps/CourseStep";
 import { ReviewStep } from "../../features/tutor/components/steps/ReviewStep";
 import { useTutorProfileForm } from "../../features/tutor/hooks/useTutorProfile";
+import { useScrollToTopOnStep } from "../../features/tutor/hooks/useScrollToTopOnStep";
 import type { TutorProfileFormValues } from "../../features/tutor/types";
 
 const TOTAL_STEPS = 4;
@@ -44,6 +45,8 @@ export default function TutorProfileForm() {
   });
 
   const form = useTutorProfileForm(formik);
+
+  useScrollToTopOnStep(form.step);
 
   const nameError = formik.touched.name ? (formik.errors.name as string | undefined) : undefined;
   const titleError = formik.touched.title ? (formik.errors.title as string | undefined) : undefined;
