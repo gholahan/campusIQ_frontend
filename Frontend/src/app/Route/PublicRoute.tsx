@@ -1,19 +1,23 @@
-import { useGetMe } from '@/features/auth/hooks/useAuthApi';
-import Authloader from '@/shared/components/ui/AuthLoader';
 import { Navigate, Outlet } from 'react-router-dom';
+import { Role, useAuthStore } from '@/features/auth';
 
 const PublicRoute = () => {
-  const { me, isLoading } = useGetMe();
+  const session = useAuthStore((state) => state.session);
+  const initialized = useAuthStore((state) => state.initialized);
+  // const { me, isLoading } = useGetMe();
 
-  if (isLoading) {
-    return <Authloader />;
+  if (!initialized) {
+    return null;
   }
 
-  if (me) {
-    const destination =
-      me.role === 'tutor' && !me.onboarding_complete
+  const metadata = session?.user.app_metadata as
+    | { role?: Role; onboarding_complete?: boolean }
+    | undefined;
+
+  if (session && metadata?.role) {
+    const destination = metadata.role === 'tutor' && !metadata.onboarding_complete
         ? '/tutor/onboarding'
-        : `/${me.role}/dashboard`;
+        : `/${metadata.role}/dashboard`;
     return <Navigate to={destination} replace />;
   }
 

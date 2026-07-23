@@ -13,6 +13,7 @@ import { ReviewStep } from "../../features/tutor/components/steps/ReviewStep";
 import { useTutorProfileForm } from "../../features/tutor/hooks/useTutorProfile";
 import { useScrollToTopOnStep } from "../../features/tutor/hooks/useScrollToTopOnStep";
 import type { TutorProfileFormValues } from "../../features/tutor/types";
+import { supabase } from "@/lib/supabase";
 
 const TOTAL_STEPS = 4;
 
@@ -38,6 +39,7 @@ export default function TutorProfileForm() {
       console.log("Final payload:", payload);
       try {
         await createTutorAsync(payload);
+        await supabase.auth.refreshSession();
       } catch {
         // error surfaced via mutationError
       }

@@ -7,13 +7,16 @@ import type { Role } from '@/shared/types';
 import { signupSchema, signupInitialValues } from '@/shared/lib/validation/signupSchema';
 
 import { FieldError } from '@/shared/components/ui';
+import {supabase} from '@/lib/supabase';
 import { fieldClass } from '@/shared/lib/fieldClass';
 import { useAuthStore } from '@/features/auth/authStore';
 import { FcGoogle } from 'react-icons/fc';
 import { GraduationCap, BookOpen } from 'lucide-react';
 import { useSyncUser } from '@/features/auth/hooks/useAuthApi';
-import { queryClient } from '@/lib/react-query';
+// import { queryClient } from '@/lib/react-query';
 import { PiEyeLight, PiEyeSlashLight } from 'react-icons/pi';
+
+
 export const PENDING_ROLE_KEY = 'campusiq_pending_role';
 
 export function SignupPage() {
@@ -49,10 +52,10 @@ export function SignupPage() {
 
         // cancel any /me or /profile queries that fired the moment the
         // token was set — the user doesn't exist in the backend yet
-        await queryClient.cancelQueries({ queryKey: ["me"] });
-        await queryClient.cancelQueries({ queryKey: ["profile"] });
-        queryClient.removeQueries({ queryKey: ["me"] });
-        queryClient.removeQueries({ queryKey: ["profile"] });
+        // await queryClient.cancelQueries({ queryKey: ["me"] });
+        // await queryClient.cancelQueries({ queryKey: ["profile"] });
+        // queryClient.removeQueries({ queryKey: ["me"] });
+        // queryClient.removeQueries({ queryKey: ["profile"] });
 
         const syncedUser = await syncUserAsync({
           role,
@@ -60,8 +63,8 @@ export function SignupPage() {
           last_name: values.lastName,
         });
 
-        // now the user exists — let queries run fresh
-        await queryClient.invalidateQueries({ queryKey: ["me"] });
+        //reload user supabase metadata
+        await supabase.auth.refreshSession();
 
         localStorage.removeItem(PENDING_ROLE_KEY);
         navigate(`/${syncedUser.role}/dashboard`);

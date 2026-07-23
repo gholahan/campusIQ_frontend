@@ -80,26 +80,26 @@ export function Navbar() {
           ))}
 
          {!role && (
-  <>
-    <button
-      onClick={() => navigate('/login')}
-      className={`navbar-link ${pathname === '/login' ? 'active' : ''}`}
-    >
-      Log In
-    </button>
+          <>
+            <button
+              onClick={() => navigate('/login')}
+              className={`navbar-link ${pathname === '/login' ? 'active' : ''}`}
+            >
+              Log In
+            </button>
 
-    <button
-      onClick={() => navigate('/signup')}
-      className={`navbar-link ${pathname === '/signup' ? 'active' : ''}`}
-    >
-      Get Started
-    </button>
-  </>
-)}
+            <button
+              onClick={() => navigate('/signup')}
+              className={`navbar-link ${pathname === '/signup' ? 'active' : ''}`}
+            >
+              Get Started
+            </button>
+          </>
+        )}
         </div>
 
         {/* ── Right cluster ── */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 py-3">
           {/* Theme toggle */}
           <button
             onClick={toggle}

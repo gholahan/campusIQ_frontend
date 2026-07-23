@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useSyncUser } from '@/features/auth/hooks/useAuthApi'
 import { PENDING_ROLE_KEY } from '@/pages/auth/SignupPage'
-import { queryClient } from '@/lib/react-query'
-import { get_me } from '@/features/auth/api/authApi'
 import type { Role } from '@/shared/types'
+import { useAuthStore } from '@/features/auth/authStore'
 
 export function AuthCallback() {
   const navigate = useNavigate()
   const { syncUserAsync } = useSyncUser()
+  const session = useAuthStore((state) => state.session);
+  const metadata = session?.user.app_metadata as
+  | { role?: Role; onboarding_complete?: boolean }
+  | undefined;
+  
 
   useEffect(() => {
     const handleAuth = async () => {
@@ -19,13 +23,6 @@ export function AuthCallback() {
         navigate('/login', { replace: true });
         return;
       }
-
-      // cancel any /me queries that auto-fired on token set
-      await queryClient.cancelQueries({ queryKey: ['me'] });
-      await queryClient.cancelQueries({ queryKey: ['profile'] });
-      queryClient.removeQueries({ queryKey: ['me'] });
-      queryClient.removeQueries({ queryKey: ['profile'] });
-
       const pendingRole = localStorage.getItem(PENDING_ROLE_KEY) as Role | null;
 
       let role: Role;
@@ -43,13 +40,11 @@ export function AuthCallback() {
           localStorage.removeItem(PENDING_ROLE_KEY);
         }
       } else {
-        // returning Google user — fetch /me directly
+        // returning Google user — use user's jwt supabase metadata role  
         try {
-          const me = await get_me();
-          role = me.role;
-          queryClient.setQueryData(['me'], me);
+          role = metadata?.role;
 
-          if (role === 'tutor' && !me.onboarding_complete) {
+          if (role === 'tutor' && !metadata?.onboarding_complete) {
             navigate('/tutor/onboarding', { replace: true });
             return;
           }
@@ -59,12 +54,11 @@ export function AuthCallback() {
         }
       }
 
-      await queryClient.invalidateQueries({ queryKey: ['me'] });
       navigate(`/${role}/dashboard`, { replace: true });
     };
 
     handleAuth();
   }, []);
 
-  return <div>Signing you in…</div>
+  return <div className="bg-white flex justify-center items-center h-full" >Signing you in…</div>
 }
