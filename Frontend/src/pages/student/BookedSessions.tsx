@@ -93,7 +93,7 @@ const BookedSessions = () => {
   );
 
   if (isLoading) return (
-  <div className="flex h-screen items-center justify-center bg-[var(--bg)]">
+    <div className="flex h-screen items-center justify-center bg-[var(--bg)]">
       <Loader2 className="h-12 w-12 animate-spin text-[var(--text)]" />
     </div>
   );

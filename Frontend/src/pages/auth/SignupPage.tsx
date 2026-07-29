@@ -105,7 +105,7 @@ export function SignupPage() {
         "
       >
         {/* SCROLL AREA */}
-        <div className="overflow-y-auto px-5 sm:px-6 py-6">
+        <div className="overflow-y-auto p-6 flex-1">
 
           {/* HEADER */}
           <div className="mb-6">

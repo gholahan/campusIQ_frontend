@@ -45,8 +45,8 @@ export function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 py-10 page-enter bg-(--bg)">
-      <div className="card p-10 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-5 py-5 page-enter bg-(--bg)">
+      <div className="card p-5 w-full max-w-md">
         <div className="text-center mb-7">
           <div
             className="

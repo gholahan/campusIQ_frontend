@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import type { AIMessage } from '@/features/ai/types';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -31,12 +31,8 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
   const isLoadingMore = useRef(false);
   const userHasScrolledUp = useRef(false);
 
-  // auto-scroll to bottom on new messages only
   useEffect(() => {
-    if (isLoadingMore.current) {
-      isLoadingMore.current = false;
-      return;
-    }
+    if (isLoadingMore.current) { isLoadingMore.current = false; return; }
     if (isFirstRender.current) {
       const el = scrollRef.current;
       if (el) el.scrollTop = el.scrollHeight;
@@ -46,7 +42,6 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, loading]);
 
-  // restore scroll position after older page prepends
   useEffect(() => {
     if (pageCount <= 1) return;
     const el = scrollRef.current;
@@ -55,7 +50,6 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     if (diff > 0) el.scrollTop = diff;
   }, [pageCount]);
 
-  // track user scroll direction
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -63,7 +57,6 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     const onScroll = () => {
       const current = el.scrollTop;
       if (current < lastScrollTop) userHasScrolledUp.current = true;
-      // reset when user scrolls back near bottom
       if (el.scrollHeight - current - el.clientHeight < 100) userHasScrolledUp.current = false;
       lastScrollTop = current;
     };
@@ -71,7 +64,6 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
 
-  // intersection observer — only fires after user has scrolled up
   useEffect(() => {
     const node = topSentinelRef.current;
     const container = scrollRef.current;
@@ -101,7 +93,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
   }
 
   return (
-    <div ref={scrollRef} className="h-full overflow-y-auto">
+    <div ref={scrollRef} className="h-full overflow-y-auto overflow-x-hidden">
       <div className="max-w-3xl mx-auto w-full px-4 py-8 flex flex-col gap-3">
 
         <div ref={topSentinelRef} />
@@ -113,23 +105,63 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
         )}
 
         {messages.map((m) => (
-          <div key={m.id} className={`flex gap-1 ${m.role === 'user' ? 'justify-end' : ''}`}>
-            {m.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-[var(--bg2)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 mt-1">
-                <Sparkles size={14} />
-              </div>
-            )}
+          <div key={m.id} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'items-start'}`}>
+            {/* {m.role === 'assistant' && <AssistantAvatar />} */}
             <div
-              className={`text-[15px] leading-7 text-[var(--text)] ${
+              className={`text-[15px] leading-7 text-[var(--text)] min-w-0 ${
                 m.role === 'user'
-                  ? 'max-w-[70%] rounded-2xl px-3 py-1 bg-[var(--bg2)] border border-[var(--border)]'
+                  ? 'max-w-[70%] rounded-xl px-3 bg-[var(--surface2)] border border-[var(--border)]'
                   : 'flex-1 pt-1'
               }`}
             >
-              <div className="prose prose-neutral dark:prose-invert max-w-none">
+              <div className="prose max-w-none break-words
+                prose-p:text-[var(--text)] prose-headings:text-[var(--text)]
+                prose-strong:text-[var(--text)] prose-em:text-[var(--text)]
+                prose-li:text-[var(--text)] prose-blockquote:text-[var(--text2)]
+                prose-code:text-[var(--accent)] prose-pre:text-[var(--text)]
+                prose-th:text-[var(--text)] prose-td:text-[var(--text)]
+                prose-a:text-[var(--accent)] hover:prose-a:text-[var(--accent2)]
+                prose-p:my-3 prose-ul:my-3 prose-ol:my-3
+                prose-headings:font-semibold prose-headings:tracking-tight
+                prose-pre:rounded-xl"
+              >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeHighlight, rehypeKatex]}
+                  components={{
+                    table({ children, ...props }) {
+                      return (
+                        <div className="my-4 w-full overflow-x-auto">
+                          <table {...props} className="w-full border-collapse border border-[var(--border)] text-sm">
+                            {children}
+                          </table>
+                        </div>
+                      );
+                    },
+                    pre({ children, ...props }) {
+                      return (
+                        <div className="my-5 w-full overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface2)]">
+                          <pre {...props} className="p-5 text-[14px] leading-6 whitespace-pre">
+                            {children}
+                          </pre>
+                        </div>
+                      );
+                    },
+                    td({ children, ...props }) {
+                      return (
+                        <td {...props} className="border border-[var(--border)] px-4 py-3 text-[var(--text)] align-top">
+                          {children}
+                        </td>
+                      );
+                    },
+                    th({ children, ...props }) {
+                      return (
+                        <th {...props} className="border border-[var(--border)] bg-[var(--surface2)] px-4 py-3 text-left font-medium text-[var(--text)]">
+                          {children}
+                        </th>
+                      );
+                    },
+                  }}
                 >
                   {normalizeLatex(m.content)}
                 </ReactMarkdown>
@@ -139,10 +171,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
         ))}
 
         {loading && (
-          <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-full bg-[var(--bg2)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
-              <Sparkles size={14} />
-            </div>
+          <div className="flex gap-2 items-start">
             <div className="flex gap-1 items-center pt-2">
               {[0, 1, 2].map((i) => (
                 <span key={i} className="w-2 h-2 rounded-full bg-[var(--text3)] animate-pulse" />

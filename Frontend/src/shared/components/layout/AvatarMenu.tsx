@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/features/auth';
 import { useGetProfile } from '@/features/auth/hooks/useAuthApi';
+import { queryClient } from '@/lib/react-query';
 import { Avatar } from '@/shared/components/ui';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -57,12 +58,14 @@ export function AvatarMenu({ onNavigate, avatarOnly = false }: AvatarMenuProps) 
     setIsLoggingOut(true);
 
     try {
+      queryClient.clear();
+
       await signOut();
 
       setOpen(false);
       onNavigate?.();
 
-      navigate('/', { replace: true });
+      navigate("/login", { replace: true });
     } catch (error) {
       const message =
         error instanceof Error

@@ -5,6 +5,7 @@ import { AIHeader } from '../../features/ai/components/AIHeader';
 import { AIMessageList } from '../../features/ai/components/AIMessageList';
 import { AIInput } from '../../features/ai/components/AIInput';
 import type { AIMessage } from '@/features/ai/types';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function AIAssistant() {
   const { messages: optimistic, loading, sendMessage } = useAIStore();
@@ -24,6 +25,7 @@ export function AIAssistant() {
     const text = input;
     setInput('');
     await sendMessage(text);
+    useQueryClient().invalidateQueries({ queryKey: ["student_dashboard_stats"] });
   };
 
   return (
