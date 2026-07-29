@@ -31,7 +31,7 @@ export function AIAssistant() {
   return (
     <div className="h-full flex flex-col bg-[var(--bg)]">
       <AIHeader />
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <AIMessageList
           messages={merged}
           loading={loading || isLoading}
@@ -41,7 +41,9 @@ export function AIAssistant() {
           onLoadMore={fetchNextPage}
         />
       </div>
-      <AIInput input={input} loading={loading} onChange={setInput} onSend={send} />
+      <div className='shrink-0'>
+        <AIInput input={input} loading={loading} onChange={setInput} onSend={send} />
+      </div>
     </div>
   );
 }

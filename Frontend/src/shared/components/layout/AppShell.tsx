@@ -10,7 +10,7 @@ export function AppShell({ role }: { role?: Role }) {
   const isAI = pathname === '/student/ai';
 
   return (
-    <div className="bg-[var(--bg)] flex flex-col" style={{ height: '100svh' }}>
+    <div className="bg-[var(--bg)] flex flex-col h-dvh" >
       <ScrollToTop />
       <Navbar />
 

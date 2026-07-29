@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 
 function normalizeLatex(content: string): string {
   return content
@@ -39,6 +40,8 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
       isFirstRender.current = false;
       return;
     }
+    // if (userHasScrolledUp.current) return;
+    // if (lastMessage?.role === 'assistant') return;
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, loading]);
 
@@ -127,7 +130,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
               >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeHighlight, rehypeKatex]}
+                  rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex]}
                   components={{
                     table({ children, ...props }) {
                       return (
