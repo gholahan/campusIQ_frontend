@@ -40,7 +40,7 @@ const LINKS: Record<Role, BottomNavLink[]> = {
     //   badge: 2,
     // },
     {
-      key: 'booking',
+      key: 'sessions',
       path: '/student/sessions',
       icon: CalendarDays,
       label: 'Sessions',
@@ -55,18 +55,24 @@ const LINKS: Record<Role, BottomNavLink[]> = {
       label: 'Home',
       badge: 3,
     },
-    {
-      key: 'chat',
-      path: '/tutor/chat',
-      icon: MessageSquare,
-      label: 'Messages',
-      badge: 3,
-    },
+    // {
+    //   key: 'chat',
+    //   path: '/tutor/chat',
+    //   icon: MessageSquare,
+    //   label: 'Messages',
+    //   badge: 3,
+    // },
     {
       key: 'profile',
       path: '/tutor/profile',
       icon: PencilLine,
       label: 'Profile',
+    },
+    {
+      key: 'sessions',
+      path: '/tutor/sessions',
+      icon: CalendarDays,
+      label: 'sssions',
     },
   ],
 

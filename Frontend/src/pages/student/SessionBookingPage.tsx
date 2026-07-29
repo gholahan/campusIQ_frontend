@@ -1,5 +1,5 @@
 import { TutorProfileViewSkeleton } from '@/features/tutor/components/TutorProfileViewSkeleton';
-import { useCreateSession } from '@/features/tutor/hooks/useBooking';
+import { useCreateSession } from '@/features/session/useSession';
 import { useGetTutorById } from '@/features/tutor/hooks/useTutorApi';
 import { Avatar, FieldError } from '@/shared/components/ui';
 import { Dropdown } from '@/shared/components/ui/DropDown';
@@ -22,7 +22,7 @@ function buildSlots(availability: Record<string, { start: string; end: string }>
   );
 }
 
-export function BookingPage() {
+export function SessionBookingPage() {
   const navigate = useNavigate();
   const { tutorId } = useParams<{ tutorId: string }>();
   const { tutor, isLoading, error } = useGetTutorById(tutorId ?? '')

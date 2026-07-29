@@ -7,8 +7,9 @@ import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupPage } from '@/pages/auth/SignupPage';
 import { AIAssistant } from '@/pages/ai/AIAssistant';
 import BookedSessions from '@/pages/student/BookedSessions';
-import { BookingConfirmed } from '@/pages/student/BookingConfirmed';
-import { BookingPage } from '@/pages/student/BookingPage';
+import { SessionConfirmed } from '@/pages/student/SessionConfirmed';
+import { SessionBookingPage } from '@/pages/student/SessionBookingPage';
+import TutorSessions  from '@/pages/tutor/TutorSession';
 import { StudentChat } from '@/pages/student/StudentChat';
 import { StudentDashboard } from '@/pages/student/StudentDashboard';
 import { TutorProfileView } from '@/pages/student/TutorProfileView';
@@ -21,6 +22,7 @@ import { AppShell } from '@/shared/components/layout';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './Route/ProtectedRoute';
 import PublicRoute from './Route/PublicRoute';
+import SessionDetails from '@/features/session/SessionDetails';
 
 export function AppRoutes() {
   return (
@@ -57,12 +59,12 @@ export function AppRoutes() {
 
           <Route
             path="student/booking/:tutorId"
-            element={<BookingPage />}
+            element={<SessionBookingPage/>}
           />
 
           <Route
             path="student/booking/confirmed"
-            element={<BookingConfirmed />}
+            element={<SessionConfirmed />}
           />
 
           <Route
@@ -82,9 +84,15 @@ export function AppRoutes() {
 
           <Route
             path="student/sessions"
-            element={<BookedSessions />}
+            element={<BookedSessions/>}
+            />
+          </Route>
+
+          <Route
+            path="/student/sessions/:sessionId"
+            element={<SessionDetails role="student" />}
           />
-        </Route>
+
       </Route>
 
       {/* ───────── TUTOR ───────── */}
@@ -114,7 +122,16 @@ export function AppRoutes() {
             path="tutor/chat/:convoId"
             element={<TutorChat />}
           />
+
+          <Route
+            path="tutor/sessions"
+            element={<TutorSessions />}
+          />
         </Route>
+<Route
+  path="/tutor/sessions/:sessionId"
+  element={<SessionDetails role="tutor" />}
+/>
       </Route>
 
       {/* ───────── ADMIN ───────── */}

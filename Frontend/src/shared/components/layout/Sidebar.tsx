@@ -13,7 +13,7 @@ const CONFIG: Record<Role, SidebarSection[]> = {
     ]},
     { heading: 'Sessions', links: [
       { path: '/student/chat',    icon: '💬', label: 'Messages', count: 2 },
-      { path: '/student/booking', icon: '📅', label: 'Bookings' },
+      { path: '/student/sessions', icon: '📅', label: 'Sessions' },
     ]},
   ],
   tutor: [

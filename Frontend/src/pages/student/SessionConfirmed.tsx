@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 
-export function BookingConfirmed() {
+export function SessionConfirmed() {
   const navigate = useNavigate();
   return (
     <div className="page-enter flex flex-col items-center justify-center min-h-[60vh] text-center">
@@ -14,7 +14,7 @@ export function BookingConfirmed() {
       </div>
       <h2 className="font-display text-[28px] font-extrabold mb-2 text-[var(--text)]">Session Booked!</h2>
       <p className="text-[var(--text2)] mb-6">
-        Your session request has been sent to the tutor. You'll receive a notification once they confirm.
+        Your session request has been sent to the tutor. You'll receive a notification once they accept.
       </p>
       <button className="btn-primary" onClick={() => navigate('/student/dashboard')}>
         Back to Dashboard
