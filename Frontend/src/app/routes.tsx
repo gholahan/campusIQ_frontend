@@ -86,13 +86,12 @@ export function AppRoutes() {
             path="student/sessions"
             element={<BookedSessions/>}
             />
-          </Route>
-
-          <Route
+            
+           <Route
             path="/student/sessions/:sessionId"
             element={<SessionDetails role="student" />}
           />
-
+          </Route>
       </Route>
 
       {/* ───────── TUTOR ───────── */}
@@ -127,11 +126,11 @@ export function AppRoutes() {
             path="tutor/sessions"
             element={<TutorSessions />}
           />
+          <Route
+            path="/tutor/sessions/:sessionId"
+            element={<SessionDetails role="tutor" />}
+          />
         </Route>
-<Route
-  path="/tutor/sessions/:sessionId"
-  element={<SessionDetails role="tutor" />}
-/>
       </Route>
 
       {/* ───────── ADMIN ───────── */}

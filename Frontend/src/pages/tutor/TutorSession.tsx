@@ -52,7 +52,10 @@ function TutorSessionCard({
     : "Not scheduled";
   const navigate = useNavigate();
   return (
-    <div onClick={() =>navigate(`/tutor/sessions/${session.id}`)} className="card rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6 transition-colors hover:bg-[var(--surface2)]">
+    <div
+      onClick={() => navigate(`/tutor/sessions/${session.id}`)}
+      className="card w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6 transition-colors hover:bg-[var(--surface2)] cursor-pointer"
+    >
       <div className="flex items-start gap-3">
         <Avatar
           name={session?.student?.full_name}
@@ -60,20 +63,20 @@ function TutorSessionCard({
           size={40}
         />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-3">
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex flex-col gap-2">
             <h3 className="font-semibold text-[var(--text)] truncate">
               {session?.student?.full_name}
             </h3>
 
             <span
-              className={`text-[11px] font-medium px-2.5 py-1 rounded-full capitalize whitespace-nowrap ${STATUS_STYLES[session.status]}`}
+              className={`self-start text-[11px] font-medium px-2.5 py-1 rounded-full capitalize whitespace-nowrap ${STATUS_STYLES[session.status]}`}
             >
               {session.status.replace("_", " ")}
             </span>
           </div>
 
-          <p className="text-sm font-medium text-[var(--text)] mt-1">
+          <p className="text-sm font-medium text-[var(--text)] mt-2">
             {session.subject}
           </p>
 
@@ -87,13 +90,13 @@ function TutorSessionCard({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm text-[var(--text2)]">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-[var(--text2)] text-left">
           {session.duration} hr • ${session.cost}
         </div>
 
         {session.status === "pending" ? (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 justify-start">
             <button
               className="btn-primary px-4 py-2 text-sm"
               onClick={() => onAccept(session.id)}
@@ -110,7 +113,7 @@ function TutorSessionCard({
             </button>
           </div>
         ) : (
-          <p className="text-xs text-[var(--text3)]">
+          <p className="text-xs text-[var(--text3)] text-left">
             Booked{" "}
             {new Date(session.created_at).toLocaleString(undefined, {
               dateStyle: "medium",

@@ -40,8 +40,10 @@ export function Sidebar({ role }: { role: Role }) {
   const isActive     = (path: string) => pathname.startsWith(path);
 
   return (
-    <div className="hidden md:flex md:w-56 lg:w-60 xl:w-64 border-r flex-col gap-1 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto
-                    px-3 py-5 bg-[var(--bg2)] border-[var(--border)]">
+    <div className="hidden md:flex md:w-56
+      lg:w-60 xl:w-64 border-r 
+      flex-col gap-1 sticky top-16 h-full overflow-y-auto
+      px-3 py-5 bg-[var(--bg2)] border-[var(--border)]">
       {CONFIG[role].map((section) => (
         <div key={section.heading}>
           <div className="text-[11px] font-bold uppercase tracking-widest px-3 pt-3 pb-1.5 text-[var(--text3)]">

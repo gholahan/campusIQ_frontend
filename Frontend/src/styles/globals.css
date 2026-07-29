@@ -98,8 +98,8 @@
 *, *::before, *::after {
   box-sizing: border-box;
 }
-html { scroll-behavior: auto; }
-body { background: #ffffff; color: var(--text); min-height: 100vh; overflow-x: hidden; margin: 0; }
+html { scroll-behavior: auto; height: 100%; }
+body { background: #ffffff; color: var(--text); height: 100%; overflow-x: hidden; margin: 0; }
 h1, h2, h3, h4, h5 {
   font-family: 'Source Sans 3', sans-serif;
 }
