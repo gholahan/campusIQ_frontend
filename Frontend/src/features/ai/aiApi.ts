@@ -1,18 +1,18 @@
 import axios from "axios";
 import { useAuthStore } from "../auth";
-import type { AIMessage, PaginatedAIMessages } from "./types";
+import type {PaginatedAIMessages } from "./types";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 if (!BASE_URL) {
   throw new Error("VITE_BASE_URL is not defined");
 }
 
-const tutorApi = axios.create({
+const aiApi = axios.create({
   baseURL: `${BASE_URL}/ai`,
   headers: { "Content-Type": "application/json" },
 });
 
-tutorApi.interceptors.request.use((config) => {
+aiApi.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   if (token) {
     config.headers = config.headers || {};
@@ -21,13 +21,13 @@ tutorApi.interceptors.request.use((config) => {
   return config;
 });
 
-export async function sendMessage(userText: string): Promise<{ response: string; conversation_id: string }> {
-  const { data } = await tutorApi.post("/chat", { message: userText });
-  return { response: data.response, conversation_id: data.conversation_id };
+export async function sendMessage(userText: string): Promise<{ response: string; conversation_id: string; document_id: string | null }> {
+  const { data } = await aiApi.post("/chat", { message: userText });
+  return { response: data.response, conversation_id: data.conversation_id, document_id: data.document_id };
 }
 
 export async function get_ai_messages(cursor?: string): Promise<PaginatedAIMessages> {
-  const { data } = await tutorApi.get<PaginatedAIMessages>(`conversations`, {
+  const { data } = await aiApi.get<PaginatedAIMessages>(`conversations`, {
     params: cursor ? { cursor } : undefined,
   });
   return data;

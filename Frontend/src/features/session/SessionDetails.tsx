@@ -102,7 +102,7 @@ export default function SessionDetails({
           session.meet_link)));
 
   return (
-    <div className="page-enter w-full max-w-4xl mx-auto px-2 py-4 sm:px-4 lg:px-6 lg:py-8 pb-24 flex flex-col gap-5">
+    <div className="page-enter min-h-screen w-full max-w-4xl mx-auto px-2 py-4 sm:px-4 lg:px-6 lg:py-8 pb-24 flex flex-col gap-5 bg-[var(--bg)] text-[var(--text)]">
 
       <button
         onClick={() => navigate(-1)}

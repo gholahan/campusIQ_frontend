@@ -4,14 +4,14 @@ import { get_ai_messages } from "./aiApi";
 import type { PaginatedAIMessages } from "./types";
 
 export const useGetAiMessages = () => {
-  const accessToken = useAuthStore((s) => s.accessToken);
+  const user = useAuthStore((s) => s.user);
 
   const { data, isLoading, isFetchingNextPage, error, hasNextPage, fetchNextPage } = useInfiniteQuery<PaginatedAIMessages, Error>({
-      queryKey: ["ai-messages"],
+      queryKey: ["ai-messages", user?.id],
       queryFn: ({ pageParam }) => get_ai_messages(pageParam as string | undefined),
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage?.next_cursor ?? undefined,
-      enabled: !!accessToken,
+      enabled: !!user?.id,
       staleTime: 1000 * 60 * 5,
     });
 
