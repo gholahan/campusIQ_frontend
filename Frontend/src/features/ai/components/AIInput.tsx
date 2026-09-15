@@ -15,6 +15,7 @@ import {
 import { DocumentStatus } from "@/features/document/types";
 
 const MAX_AI_MESSAGE_LENGTH = 300;
+const PDF_FILE_TYPE = "application/pdf";
 
 interface Props {
   input: string;
@@ -91,6 +92,11 @@ export function AIInput({
     if (!file) return;
 
     e.target.value = "";
+
+    const isPdf =
+      file.name.toLowerCase().endsWith(".pdf") &&
+      (!file.type || file.type === PDF_FILE_TYPE);
+    if (!isPdf) return;
 
     // kickoff upload (uploadFile will set `pendingFile` status)
     uploadFile(file);
@@ -257,7 +263,7 @@ export function AIInput({
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf,.doc,.docx,.txt"
+              accept=".pdf,application/pdf"
               className="hidden"
               onChange={handleFileChange}
             />

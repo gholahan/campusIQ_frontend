@@ -7,15 +7,17 @@ import { AvatarMenu } from './AvatarMenu';
 
 const NAV_LINKS: Record<Role, { label: string; path: string }[]> = {
   student: [
-    { label: 'Dashboard',  path: '/student/dashboard' },
-    { label: 'Find Tutors', path: '/student/tutors'   },
-    { label: 'AI Assistant', path: '/student/ai'      },
-    { label: 'Session',    path: '/student/sessions'  },
+    { label: 'Dashboard',    path: '/student/dashboard' },
+    { label: 'Find Tutors',  path: '/student/tutors'    },
+    { label: 'AI Assistant', path: '/student/ai'        },
+    // { label: 'Chat',         path: '/student/chat'      },
+    { label: 'Session', path: '/student/sessions' }
   ],
   tutor: [
     { label: 'Dashboard', path: '/tutor/dashboard' },
     { label: 'Profile',   path: '/tutor/profile'   },
-    { label: 'Sessions',  path: '/tutor/sessions'  },
+    {label: 'Sessions',  path: '/tutor/sessions'  },
+    // { label: 'Chat',      path: '/tutor/chat'      },
   ],
   admin: [
     { label: 'Dashboard',  path: '/admin/dashboard'  },
@@ -46,7 +48,7 @@ export function Navbar() {
   return (
     <>
       {/* ── Main bar ── */}
-      <nav className="sticky top-0 z-50 w-full bg-[var(--bg2)]/85 backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--border)] px-4 sm:px-6 h-16 flex items-center justify-between">
+      <nav className="sticky top-0 z-50 w-full bg-[var(--bg2)]/85 backdrop-blur-xl backdrop-saturate-150 border-b border-[var(--border)] px-4 sm:px-6 h-14 md:h-16 flex items-center justify-between py-2.5">
         {/* Brand */}
         <button
           onClick={() => { navigate('/'); closeMobile(); }}
@@ -77,7 +79,7 @@ export function Navbar() {
                 key={l.path}
                 onClick={() => navigate(l.path)}
                 className={`
-                  relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 bg-transparent border-none cursor-pointer
+                  relative px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 bg-transparent border-none cursor-pointer
                   ${active
                     ? 'text-[var(--accent2)]'
                     : 'text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)]'
@@ -97,14 +99,14 @@ export function Navbar() {
               <div className="w-px h-6 bg-[var(--border)] mx-2" />
               <button
                 onClick={() => navigate('/login')}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all bg-transparent border-none cursor-pointer
-                  ${pathname === '/login' ? 'text-[var(--accent2)] bg-[var(--accent)]/8' : 'text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)]'}`}
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all bg-transparent border-none cursor-pointer
+                  ${pathname === '/login' ? 'text-[var(--accent2)]' : 'text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)]'}`}
               >
                 Log In
               </button>
               <button
                 onClick={() => navigate('/signup')}
-                className="px-5 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white hover:shadow-md hover:shadow-[var(--accent)]/20 transition-all duration-150 border-none cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all duration-150 bg-transparent border-none cursor-pointer"
               >
                 Get Started
               </button>
@@ -139,7 +141,7 @@ export function Navbar() {
       {/* ── Mobile drawer ── */}
       <div
         className={`
-          md:hidden fixed inset-x-0 top-16 z-[99]
+          md:hidden fixed inset-x-0 top-14 z-[99]
           bg-[var(--bg2)]/95 backdrop-blur-xl border-b border-[var(--border)]
           transition-all duration-200 origin-top
           ${mobileOpen ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'}
@@ -172,7 +174,7 @@ export function Navbar() {
               </button>
               <button
                 onClick={() => { navigate('/signup'); closeMobile(); }}
-                className="w-full text-center py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-[var(--accent)] to-[var(--accent2)] text-white border-none cursor-pointer"
+                className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all bg-transparent border-none cursor-pointer"
               >
                 Get Started
               </button>

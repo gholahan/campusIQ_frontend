@@ -51,12 +51,9 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
       isFirstRender.current = false;
       return;
     }
-
-    if (userHasScrolledUp.current) return;
-
-    endRef.current?.scrollIntoView({
-      behavior: 'smooth',
-    });
+    // if (userHasScrolledUp.current) return;
+    // if (lastMessage?.role === 'assistant') return;
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, loading]);
 
   useEffect(() => {
