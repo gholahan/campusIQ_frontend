@@ -1,12 +1,14 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { AIMessage } from '@/features/ai/types';
+import { AiChatRole } from '@/features/ai/enums';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
+import DocumentCard from '@/features/document/components/DocumentCard';
 
 function normalizeLatex(content: string): string {
   return content
@@ -32,17 +34,29 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
   const isLoadingMore = useRef(false);
   const userHasScrolledUp = useRef(false);
 
+
   useEffect(() => {
-    if (isLoadingMore.current) { isLoadingMore.current = false; return; }
+    if (isLoadingMore.current) {
+      isLoadingMore.current = false;
+      return;
+    }
+
     if (isFirstRender.current) {
       const el = scrollRef.current;
-      if (el) el.scrollTop = el.scrollHeight;
+
+      if (el) {
+        el.scrollTop = el.scrollHeight;
+      }
+
       isFirstRender.current = false;
       return;
     }
-    // if (userHasScrolledUp.current) return;
-    // if (lastMessage?.role === 'assistant') return;
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+    if (userHasScrolledUp.current) return;
+
+    endRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
   }, [messages.length, loading]);
 
   useEffect(() => {
@@ -85,6 +99,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
+
   if (!messages.length && !loading) {
     return (
       <div className="h-full flex flex-col items-center justify-center px-4">
@@ -117,6 +132,9 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
                   : 'flex-1 pt-1'
               }`}
             >
+              {m.role === AiChatRole.User && m.document_id && (
+                <DocumentCard documentId={m.document_id} />
+              )}
               <div className="prose max-w-none break-words
                 prose-p:text-[var(--text)] prose-headings:text-[var(--text)]
                 prose-strong:text-[var(--text)] prose-em:text-[var(--text)]
