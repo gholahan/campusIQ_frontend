@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { AIMessage } from "./types";
 import { sendMessage as apiSend } from "./aiApi";
+import { AiChatRole } from "./enums";
 
 interface AIMessageStore {
   messages: AIMessage[];
@@ -20,14 +21,15 @@ export const useAIStore = create<AIMessageStore>((set, get) => ({
     const userMsg: AIMessage = {
       id: tempId,
       conversation_id: get().conversationId ?? "",
-      role: "user",
+      role: AiChatRole.User,
       content: text,
+      document_id: null,
       created_at: new Date().toISOString(),
     };
     set((s) => ({ messages: [...s.messages, userMsg], loading: true }));
 
     try {
-      const { response, conversation_id } = await apiSend(text);
+      const { response, conversation_id, document_id } = await apiSend(text);
       set((s) => ({
         conversationId: conversation_id,
         messages: [
@@ -35,8 +37,9 @@ export const useAIStore = create<AIMessageStore>((set, get) => ({
           {
             id: crypto.randomUUID(),
             conversation_id,
-            role: "assistant",
+            role: AiChatRole.Assistant,
             content: response,
+            document_id,
             created_at: new Date().toISOString(),
           },
         ],
@@ -48,8 +51,9 @@ export const useAIStore = create<AIMessageStore>((set, get) => ({
           {
             id: crypto.randomUUID(),
             conversation_id: get().conversationId ?? "",
-            role: "assistant",
+            role: AiChatRole.Assistant,
             content: "Something went wrong. Please try again.",
+            document_id: null,
             created_at: new Date().toISOString(),
           },
         ],
