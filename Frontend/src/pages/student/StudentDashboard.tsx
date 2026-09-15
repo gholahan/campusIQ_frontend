@@ -12,6 +12,14 @@ function formatSessionSlot(scheduled_at?: { day: string; start: string; end: str
   return `${scheduled_at.day} · ${scheduled_at.start}–${scheduled_at.end}`;
 }
 
+function getTimeGreeting() {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
 function getSessionSortKey(session: { scheduled_at?: { day: string }; created_at: string }) {
   if (session.scheduled_at?.day) {
     const parsed = Date.parse(session.scheduled_at.day);
@@ -28,6 +36,7 @@ export function StudentDashboard() {
   const { sessions = [] } = useGetStudentSessions();
 
   const summarySessions = stats?.sessions.this_week ?? 0;
+  const greeting = getTimeGreeting();
 
   const upcomingSessions = sessions
     .filter((session) => ['pending', 'accepted'].includes(session.status))
@@ -50,7 +59,7 @@ export function StudentDashboard() {
       {/* Header */}
       <div className="mb-5 sm:mb-7">
         <h1 className="font-display text-[20px] sm:text-[26px] font-extrabold mb-1 tracking-[-0.5px] text-[var(--text)]">
-          Good morning, {user?.first_name}! 👋
+          {greeting}, {user?.first_name}! 👋
         </h1>
         <p className="text-[var(--text2)] text-xs sm:text-sm">
           You have {summarySessions} sessions scheduled this week

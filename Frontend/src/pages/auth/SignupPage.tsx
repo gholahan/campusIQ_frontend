@@ -33,7 +33,7 @@ export function SignupPage() {
     setRole(r);
     setRoleError('');
     localStorage.setItem(PENDING_ROLE_KEY, r);
-    formik.resetForm();
+    if (!formik.isSubmitting) formik.resetForm();
   };
 
   const formik = useFormik({
@@ -47,24 +47,19 @@ export function SignupPage() {
       }
 
       try {
-        const res = await signUp(values.email, values.password);
-        console.log('res:', res);
-
-        // cancel any /me or /profile queries that fired the moment the
-        // token was set — the user doesn't exist in the backend yet
-        // await queryClient.cancelQueries({ queryKey: ["me"] });
-        // await queryClient.cancelQueries({ queryKey: ["profile"] });
-        // queryClient.removeQueries({ queryKey: ["me"] });
-        // queryClient.removeQueries({ queryKey: ["profile"] });
-
-        const syncedUser = await syncUserAsync({
-          role,
-          first_name: values.firstName,
-          last_name: values.lastName,
-        });
-
-        //reload user supabase metadata
-        await supabase.auth.refreshSession();
+        await signUp(values.email, values.password);
+        let syncedUser;
+        try {
+          syncedUser = await syncUserAsync({
+            role,
+            first_name: values.firstName,
+            last_name: values.lastName,
+          });
+          await supabase.auth.refreshSession();
+        } catch (syncErr: any) {
+          await supabase.auth.signOut();
+          throw syncErr;
+        }
 
         localStorage.removeItem(PENDING_ROLE_KEY);
         navigate(`/${syncedUser.role}/dashboard`);

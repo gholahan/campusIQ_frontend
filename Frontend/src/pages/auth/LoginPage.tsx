@@ -5,135 +5,125 @@ import { loginInitialValues, loginSchema } from '@/shared/lib/validation/loginSc
 import type { Role } from '@/shared/types';
 import { useFormik } from 'formik';
 import { Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { PiEyeLight, PiEyeSlashLight } from 'react-icons/pi';
 import { get_me } from '@/features/auth/api/authApi';
-import {queryClient} from '@/lib/react-query'
-
 
 const DASHBOARD: Record<Role, string> = {
-  student: '/student/dashboard', tutor: '/tutor/dashboard', admin: '/admin/dashboard',
+  student: '/student/dashboard',
+  tutor: '/tutor/dashboard',
+  admin: '/admin/dashboard',
 };
 
 export function LoginPage() {
-  const {signIn, signInWithGoogle} = useAuthStore()
+  const { signIn, signInWithGoogle } = useAuthStore();
   const navigate = useNavigate();
-  const [authError, setAuthError] = useState<string>('');
+  const [authError, setAuthError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  const submitting = useRef(false);
 
   const formik = useFormik({
     initialValues: loginInitialValues,
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-    setAuthError("");
-
-    try {
-      await signIn(values.email, values.password);
-
-      const profile = await get_me();
-      console.log(profile)
-
-      queryClient.setQueryData(["profile"], profile);
-
-      navigate(DASHBOARD[profile.role]);
-    } catch (err: any) {
-      setAuthError(err.message || "Login failed");
-    }
-  },
+      if (submitting.current) return;
+      submitting.current = true;
+      setAuthError('');
+      try {
+        const res = await signIn(values.email, values.password);
+        const role = res.data.session?.user.app_metadata?.role as Role | undefined;
+        if (role) {
+          navigate(DASHBOARD[role], { replace: true });
+        } else {
+          const me = await get_me();
+          navigate(DASHBOARD[me.role], { replace: true });
+        }
+      } catch (err: any) {
+        setAuthError(err.message || 'Login failed');
+      } finally {
+        submitting.current = false;
+      }
+    },
   });
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-5 page-enter bg-(--bg)">
       <div className="card p-5 w-full max-w-md">
         <div className="text-center mb-7">
-          <div
-            className="
-              w-12 h-12 mx-auto mb-4
-              rounded-2xl
-              border border-(--border)
-              bg-(--bg2)
-              flex items-center justify-center
-            "
-          >
-            <Sparkles
-              size={20}
-              className="text-[var(--accent2)]"
-            />
+          <div className="w-12 h-12 mx-auto mb-4 rounded-2xl border border-(--border) bg-(--bg2) flex items-center justify-center">
+            <Sparkles size={20} className="text-[var(--accent2)]" />
           </div>
           <h2 className="font-display text-[26px] font-extrabold mb-1 text-(--text)">Welcome back</h2>
           <p className="text-(--text2) text-sm">Sign in to continue your learning journey</p>
         </div>
-        
-      <form onSubmit={formik.handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-[13px] font-semibold text-(--text2) mb-1.5">Email or Username</label>
-          <input type="email" placeholder="amara@gmail.com" className={fieldClass(formik.touched.email, formik.errors.email)} {...formik.getFieldProps('email')} />
-          <FieldError message={formik.touched.email ? formik.errors.email : undefined} />
-        </div>
 
-        <div className="mb-4">
-          <label className="block text-[13px] font-semibold text-(--text2) mb-1.5">Password</label>
-          <div className="relative">
+        <form onSubmit={formik.handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-[13px] font-semibold text-(--text2) mb-1.5">Email</label>
             <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Your password"
-              className={fieldClass(formik.touched.password, formik.errors.password)}
-              {...formik.getFieldProps('password')}
+              type="email"
+              placeholder="you@example.com"
+              className={fieldClass(formik.touched.email, formik.errors.email)}
+              {...formik.getFieldProps('email')}
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text3)] hover:text-[var(--text2)] transition-colors"
-              tabIndex={-1}
-            >
-              {showPassword ? <PiEyeSlashLight size={18} /> : <PiEyeLight size={18} />}
-            </button>
+            <FieldError message={formik.touched.email ? formik.errors.email : undefined} />
           </div>
-          <FieldError message={formik.touched.password ? formik.errors.password : undefined} />
-        </div>
 
-        {authError && <div className="mb-4 text-red-500 text-sm">{authError}</div>}
+          <div className="mb-4">
+            <label className="block text-[13px] font-semibold text-(--text2) mb-1.5">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Your password"
+                className={fieldClass(formik.touched.password, formik.errors.password)}
+                {...formik.getFieldProps('password')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text3)] hover:text-[var(--text2)] transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <PiEyeSlashLight size={18} /> : <PiEyeLight size={18} />}
+              </button>
+            </div>
+            <FieldError message={formik.touched.password ? formik.errors.password : undefined} />
+          </div>
 
-        <div className="flex justify-end mb-5">
-          <span className="text-[13px] text-(--accent2) cursor-pointer font-medium">Forgot password?</span>
-        </div>
+          {authError && <div className="mb-4 text-red-500 text-sm">{authError}</div>}
 
-        <button
-          type="submit"
-          disabled={formik.isSubmitting}
-          className="
-            btn-primary
-            w-full justify-center
-            py-3
-            text-[15px]
-            font-bold
-            disabled:opacity-50
-            disabled:cursor-not-allowed
-          "
-        >
-          {formik.isSubmitting
-            ? "Signing In..."
-            : "Sign In →"}
-        </button>
+          <div className="flex justify-end mb-5">
+            <span className="text-[13px] text-(--accent2) cursor-pointer font-medium">Forgot password?</span>
+          </div>
 
-      </form>
+          <button
+            type="submit"
+            disabled={formik.isSubmitting}
+            className="btn-primary w-full justify-center py-3 text-[15px] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {formik.isSubmitting ? 'Signing In...' : 'Sign In →'}
+          </button>
+        </form>
 
         <div className="auth-divider"><span className="text-xs text-(--text3)">or</span></div>
 
         <button
-        onClick={signInWithGoogle}
-        type="button"
-        className="btn-secondary w-full justify-center mb-4"
+          onClick={signInWithGoogle}
+          type="button"
+          className="btn-secondary w-full justify-center mb-4"
         >
           <FcGoogle size={18} />
-          Continue with Google   
+          Continue with Google
         </button>
 
         <div className="text-center text-[13px] text-(--text2)">
           Don't have an account?{' '}
-          <span className="text-(--accent2) cursor-pointer font-semibold" onClick={() => navigate('/signup')}>Sign up</span>
+          <span className="text-(--accent2) cursor-pointer font-semibold" onClick={() => navigate('/signup')}>
+            Sign up
+          </span>
         </div>
       </div>
     </div>
