@@ -11,7 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useGetDocumentById } from "../useDocumentApi";
-import type { DocumentResponse, DocumentStatus } from "../types";
+import type { DocumentResponse } from "../types";
 
 type FileKind =
   | "pdf"
@@ -81,17 +81,16 @@ function getKind(filename: string): FileKind {
   return EXT_TO_KIND[ext] ?? "other";
 }
 
-// NOTE: adjust to match your real DocumentStatus union — inferred from
-// field naming since only the response shape was given, not the enum.
-const PENDING_STATUSES = new Set<DocumentStatus>(["pending", "processing"] as DocumentStatus[]);
-const FAILED_STATUSES = new Set<DocumentStatus>(["failed", "error"] as DocumentStatus[]);
-
 export default function DocumentCard({ documentId, onOpen, onDownload }: DocumentCardProps) {
   const [hovered, setHovered] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const { document, isLoading, error } = useGetDocumentById(documentId);
+  const {
+    document,
+    isLoading: isDocumentLoading,
+    error: documentError,
+  } = useGetDocumentById(documentId);
 
-  if (isLoading) {
+  if (isDocumentLoading) {
     return (
       <div className="flex w-full max-w-sm items-center gap-3 rounded-xl border border-[#E8E5DE] bg-white px-3 py-2.5">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F0EEEA]">
@@ -105,7 +104,7 @@ export default function DocumentCard({ documentId, onOpen, onDownload }: Documen
     );
   }
 
-  if (error || !document || FAILED_STATUSES.has(document.status)) {
+  if (documentError || !document || document.status === "failed") {
     return (
       <div className="flex w-full max-w-sm items-center gap-3 rounded-xl border border-[#F3D6D0] bg-[#FDF6F4] px-3 py-2.5">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FBE9E7]">
@@ -116,7 +115,7 @@ export default function DocumentCard({ documentId, onOpen, onDownload }: Documen
             {document?.file_name ?? "Document"}
           </span>
           <span className="block truncate text-[12px] text-[#B54A34]">
-            {error ? "Couldn't load this file" : "Something went wrong generating this file"}
+            {documentError ? "Couldn't load this file" : "Something went wrong generating this file"}
           </span>
         </span>
       </div>
@@ -125,7 +124,7 @@ export default function DocumentCard({ documentId, onOpen, onDownload }: Documen
 
   const kind = getKind(document.file_name);
   const { icon: Icon, bg, fg, label } = KIND_STYLES[kind];
-  const isGenerating = PENDING_STATUSES.has(document.status);
+  const isGenerating = document.status === "processing";
   const meta = [label, document.page_count ? `${document.page_count} pages` : null]
     .filter(Boolean)
     .join(" · ");

@@ -4,6 +4,10 @@ export enum DocumentStatus {
   failed = "failed",
 }
 
+export interface DocumentStatusResponse {
+  status: DocumentStatus;
+}
+
 export interface UploadDocumentRequest {
   file_name: string;
   file_url: string;

@@ -20,11 +20,11 @@ export function AIAssistant() {
     ...optimistic.filter((m) => !historyIds.has(m.id)),
   ];
 
-  const send = async () => {
+  const send = async (documentId?: string) => {
     if (!input.trim() || loading) return;
     const text = input;
     setInput('');
-    await sendMessage(text);
+    await sendMessage(text, documentId);
     useQueryClient().invalidateQueries({ queryKey: ["student_dashboard_stats"] });
   };
 

@@ -3,6 +3,7 @@ import { useAuthStore } from "../auth";
 import type {
   UploadDocumentRequest,
   DocumentResponse,
+  DocumentStatusResponse,
 } from "./types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -41,6 +42,16 @@ export const getDocument = async (
 ): Promise<DocumentResponse> => {
   const { data } = await docApi.get<DocumentResponse>(
     `/${documentId}`
+  );
+
+  return data;
+};
+
+export const getDocumentStatus = async (
+  documentId: string
+): Promise<DocumentStatusResponse> => {
+  const { data } = await docApi.get<DocumentStatusResponse>(
+    `/${documentId}/status`
   );
 
   return data;

@@ -21,8 +21,8 @@ aiApi.interceptors.request.use((config) => {
   return config;
 });
 
-export async function sendMessage(userText: string): Promise<{ response: string; conversation_id: string; document_id: string | null }> {
-  const { data } = await aiApi.post("/chat", { message: userText });
+export async function sendMessage(userText: string, documentId?: string): Promise<{ response: string; conversation_id: string; document_id: string | null }> {
+  const { data } = await aiApi.post("/chat", { message: userText, document_id: documentId ?? null });
   return { response: data.response, conversation_id: data.conversation_id, document_id: data.document_id };
 }
 
