@@ -18,7 +18,7 @@ export function AppShell({ role }: { role?: Role }) {
         <div className="flex flex-1 min-h-0">
           <Sidebar role={role} />
           <main
-            className={`flex-1 min-h-0 relative ${
+            className={`flex-1 min-h-0 relative ml-1 ${
               isAI
                 ? 'overflow-hidden p-0'
                 : 'overflow-y-auto p-2 md:p-4 lg:p-6 pb-20'
