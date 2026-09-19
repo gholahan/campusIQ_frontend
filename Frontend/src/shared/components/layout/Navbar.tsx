@@ -96,17 +96,18 @@ export function Navbar() {
 
           {!role && (
             <>
-              <div className="w-px h-6 bg-[var(--border)] mx-2" />
+              {/* <div className="w-px h-6 bg-[var(--border)] mx-2" /> */}
               <button
                 onClick={() => navigate('/login')}
                 className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all bg-transparent border-none cursor-pointer
-                  ${pathname === '/login' ? 'text-[var(--accent2)]' : 'text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)]'}`}
+                  ${pathname === '/login' ? 'text-(--accent2)' : 'text-(--text2) hover:text-(--text) hover:bg-(--bg3)'}`}
               >
                 Log In
               </button>
               <button
                 onClick={() => navigate('/signup')}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all duration-150 bg-transparent border-none cursor-pointer"
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 bg-transparent border-none cursor-pointer
+                  ${pathname === '/signup' ? 'text-(--accent2)' : 'text-(--text2) hover:text-(--text) hover:bg-(--bg3)'}`}
               >
                 Get Started
               </button>
@@ -174,7 +175,8 @@ export function Navbar() {
               </button>
               <button
                 onClick={() => { navigate('/signup'); closeMobile(); }}
-                className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-[var(--text2)] hover:text-[var(--text)] hover:bg-[var(--bg3)] transition-all bg-transparent border-none cursor-pointer"
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all bg-transparent border-none cursor-pointer
+                  ${pathname === '/signup' ? 'text-(--accent2)' : 'text-(--text2) hover:text-(--text) hover:bg-(--bg3)'}`}
               >
                 Get Started
               </button>
