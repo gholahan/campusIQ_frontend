@@ -130,14 +130,14 @@ export function AIInput({
   }
 
   return (
-    <div className="w-full px-3 pb-4 pt-2">
+    <div className="w-full px-2 sm:px-3 pb-3 sm:pb-4 pt-2">
       <div className="mx-auto w-full max-w-3xl">
 
         {/* Composer */}
         <div
           className="
             relative
-            rounded-3xl
+            rounded-2xl sm:rounded-3xl
             border
             border-[var(--border)]
             bg-[var(--bg3)]
@@ -149,19 +149,19 @@ export function AIInput({
 
           {/* File preview */}
           {pendingFile && (
-            <div className="px-3 pt-3">
+            <div className="px-2 sm:px-3 pt-2 sm:pt-3">
               <div
                 className="
                   flex
                   w-fit
-                  max-w-[280px]
+                  max-w-full
                   items-center
                   gap-2
                   rounded-xl
                   border
                   border-[var(--border)]
                   bg-[var(--bg2)]
-                  px-3
+                  px-2 sm:px-3
                   py-2
                 "
               >
@@ -257,7 +257,7 @@ export function AIInput({
           )}
 
           {/* Main input row */}
-          <div className="flex items-end gap-2 px-3 py-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2">
 
             {/* Hidden file input */}
             <input
@@ -277,7 +277,6 @@ export function AIInput({
               disabled={composerIsBusy}
               aria-label="Attach file"
               className="
-                mb-0.5
                 flex
                 h-8
                 w-8
@@ -324,14 +323,14 @@ export function AIInput({
                 }
               }}
               className="
-                max-h-40
+                max-h-32
                 min-h-7
                 flex-1
                 resize-none
                 overflow-y-auto
                 bg-transparent
                 py-0.5
-                text-[15px]
+                text-[14px] sm:text-[15px]
                 leading-6
                 text-[var(--text)]
                 outline-none
@@ -350,7 +349,6 @@ export function AIInput({
               }
               aria-label="Send message"
               className="
-                mb-0.5
                 flex
                 h-8
                 w-8

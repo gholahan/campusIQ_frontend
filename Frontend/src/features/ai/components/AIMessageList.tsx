@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { Loader2, ChevronDown } from 'lucide-react';
 import type { AIMessage } from '@/features/ai/types';
 import { AiChatRole } from '@/features/ai/enums';
 import ReactMarkdown from "react-markdown";
@@ -33,29 +33,74 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
   const isFirstRender = useRef(true);
   const isLoadingMore = useRef(false);
   const userHasScrolledUp = useRef(false);
+  const isAutoScrolling = useRef(false);
+  const prevMessageCount = useRef(0);
 
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
+  const scrollToBottom = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isAutoScrolling.current = true;
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    userHasScrolledUp.current = false;
+    setShowScrollToBottom(false);
+  }, []);
+
+  // Wait for the initial message fetch before scrolling to the latest message.
   useEffect(() => {
-    if (isLoadingMore.current) {
-      isLoadingMore.current = false;
-      return;
-    }
-
     if (isFirstRender.current) {
+      if (!messages.length) return;
+
       const el = scrollRef.current;
+      const frame = requestAnimationFrame(() => {
+        if (el) el.scrollTop = el.scrollHeight;
+        isFirstRender.current = false;
+        prevMessageCount.current = messages.length;
+      });
+      return () => cancelAnimationFrame(frame);
+    }
 
+    // Track if a new message arrived while user was scrolled up
+    if (messages.length > prevMessageCount.current) {
+      const el = scrollRef.current;
       if (el) {
-        el.scrollTop = el.scrollHeight;
+        const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+        if (!isNearBottom) {
+          userHasScrolledUp.current = true;
+          setShowScrollToBottom(true);
+        }
       }
+    }
+    prevMessageCount.current = messages.length;
+  }, [messages.length]);
 
-      isFirstRender.current = false;
+  // Handle loading state changes (AI typing indicator)
+  useEffect(() => {
+    if (loading && messages.length > prevMessageCount.current) {
+      // New user message appeared, don't auto-scroll
       return;
     }
-    // if (userHasScrolledUp.current) return;
-    // if (lastMessage?.role === 'assistant') return;
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length, loading]);
+  }, [loading, messages.length]);
 
+  // Auto-scroll when loading finishes (AI finished responding)
+  useEffect(() => {
+    if (!loading && prevMessageCount.current > 0 && messages.length > prevMessageCount.current) {
+      // AI response just arrived — only auto-scroll if user is near bottom
+      const el = scrollRef.current;
+      if (el) {
+        const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+        if (wasNearBottom) {
+          el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+          userHasScrolledUp.current = false;
+          setShowScrollToBottom(false);
+        }
+      }
+    }
+    prevMessageCount.current = messages.length;
+  }, [loading, messages.length]);
+
+  // Pagination
   useEffect(() => {
     if (pageCount <= 1) return;
     const el = scrollRef.current;
@@ -64,20 +109,28 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     if (diff > 0) el.scrollTop = diff;
   }, [pageCount]);
 
+  // Scroll listener to track user position and show/hide button
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    let lastScrollTop = el.scrollTop;
     const onScroll = () => {
-      const current = el.scrollTop;
-      if (current < lastScrollTop) userHasScrolledUp.current = true;
-      if (el.scrollHeight - current - el.clientHeight < 100) userHasScrolledUp.current = false;
-      lastScrollTop = current;
+      const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+      if (isNearBottom) {
+        userHasScrolledUp.current = false;
+        setShowScrollToBottom(false);
+        isAutoScrolling.current = false;
+      } else if (isAutoScrolling.current) {
+        return;
+      } else {
+        userHasScrolledUp.current = true;
+        setShowScrollToBottom(true);
+      }
     };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
 
+  // IntersectionObserver for pagination
   useEffect(() => {
     const node = topSentinelRef.current;
     const container = scrollRef.current;
@@ -96,11 +149,10 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
-
   if (!messages.length && !loading) {
     return (
       <div className="h-full flex flex-col items-center justify-center px-4">
-        <h1 className="text-3xl md:text-4xl font-semibold text-center mb-10 tracking-[-1px] text-[var(--text)]">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-8 sm:mb-10 tracking-[-1px] text-[var(--text)]">
           How can I help you today?
         </h1>
       </div>
@@ -109,7 +161,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
 
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto overflow-x-hidden">
-      <div className="max-w-3xl mx-auto w-full px-4 py-8 flex flex-col gap-3">
+      <div className="max-w-3xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8 flex flex-col gap-2 sm:gap-3">
 
         <div ref={topSentinelRef} />
 
@@ -121,11 +173,10 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
 
         {messages.map((m) => (
           <div key={m.id} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'items-start'}`}>
-            {/* {m.role === 'assistant' && <AssistantAvatar />} */}
             <div
-              className={`text-[15px] leading-7 text-[var(--text)] min-w-0 ${
+              className={`text-[14px] sm:text-[15px] leading-7 text-[var(--text)] min-w-0 ${
                 m.role === 'user'
-                  ? 'max-w-[70%] rounded-xl px-3 bg-[var(--surface2)] border border-[var(--border)]'
+                  ? 'max-w-[88%] sm:max-w-[70%] rounded-xl px-3 bg-[var(--surface2)] border border-[var(--border)]'
                   : 'flex-1 pt-1'
               }`}
             >
@@ -150,7 +201,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
                     table({ children, ...props }) {
                       return (
                         <div className="my-4 w-full overflow-x-auto">
-                          <table {...props} className="w-full border-collapse border border-[var(--border)] text-sm">
+                          <table {...props} className="w-full border-collapse border border-[var(--border)] text-xs sm:text-sm">
                             {children}
                           </table>
                         </div>
@@ -159,7 +210,7 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
                     pre({ children, ...props }) {
                       return (
                         <div className="my-5 w-full overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface2)]">
-                          <pre {...props} className="p-5 text-[14px] leading-6 whitespace-pre">
+                          <pre {...props} className="p-3 sm:p-5 text-[13px] sm:text-[14px] leading-6 whitespace-pre">
                             {children}
                           </pre>
                         </div>
@@ -167,14 +218,14 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
                     },
                     td({ children, ...props }) {
                       return (
-                        <td {...props} className="border border-[var(--border)] px-4 py-3 text-[var(--text)] align-top">
+                        <td {...props} className="border border-[var(--border)] px-2 sm:px-4 py-2 sm:py-3 text-[var(--text)] align-top">
                           {children}
                         </td>
                       );
                     },
                     th({ children, ...props }) {
                       return (
-                        <th {...props} className="border border-[var(--border)] bg-[var(--surface2)] px-4 py-3 text-left font-medium text-[var(--text)]">
+                        <th {...props} className="border border-[var(--border)] bg-[var(--surface2)] px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-[var(--text)]">
                           {children}
                         </th>
                       );
@@ -200,6 +251,27 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
 
         <div ref={endRef} />
       </div>
+
+      {/* Scroll-to-bottom button */}
+      {showScrollToBottom && (
+        <button
+          onClick={scrollToBottom}
+          className="
+            fixed bottom-20 left-1/2 -translate-x-1/2
+            z-50 flex items-center gap-2
+            max-w-[calc(100vw-2rem)] px-3 sm:px-4 py-2 sm:py-2.5 rounded-full
+            bg-(--surface) border border-(--border)
+            shadow-lg text-xs sm:text-sm font-medium text-(--text2) whitespace-nowrap
+            cursor-pointer
+            hover:bg-(--bg3) hover:text-(--text) transition-all
+            animate-in slide-in-from-bottom-2 fade-in duration-200
+          "
+          aria-label="Scroll to bottom"
+        >
+          <ChevronDown size={16} />
+          New messages
+        </button>
+      )}
     </div>
   );
 }
