@@ -10,11 +10,9 @@ import BookedSessions from '@/pages/student/BookedSessions';
 import { SessionConfirmed } from '@/pages/student/SessionConfirmed';
 import { SessionBookingPage } from '@/pages/student/SessionBookingPage';
 import TutorSessions  from '@/pages/tutor/TutorSession';
-import { StudentChat } from '@/pages/student/StudentChat';
 import { StudentDashboard } from '@/pages/student/StudentDashboard';
 import { TutorProfileView } from '@/pages/student/TutorProfileView';
 import { TutorSearch } from '@/pages/student/TutorSearch';
-import { TutorChat } from '@/pages/tutor/TutorChat';
 import { TutorDashboard } from '@/pages/tutor/TutorDashboard';
 import { TutorProfileEdit } from '@/pages/tutor/TutorProfile';
 import TutorProfileForm from '@/pages/tutor/TutorProfileForm';
@@ -68,16 +66,6 @@ export function AppRoutes() {
           />
 
           <Route
-            path="student/chat"
-            element={<StudentChat />}
-          />
-
-          <Route
-            path="student/chat/:convoId"
-            element={<StudentChat />}
-          />
-
-          <Route
             path="student/ai"
             element={<AIAssistant />}
           />
@@ -110,16 +98,6 @@ export function AppRoutes() {
           <Route
             path="tutor/profile"
             element={<TutorProfileEdit />}
-          />
-
-          <Route
-            path="tutor/chat"
-            element={<TutorChat />}
-          />
-
-          <Route
-            path="tutor/chat/:convoId"
-            element={<TutorChat />}
           />
 
           <Route

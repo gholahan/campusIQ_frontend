@@ -10,14 +10,12 @@ const NAV_LINKS: Record<Role, { label: string; path: string }[]> = {
     { label: 'Dashboard',    path: '/student/dashboard' },
     { label: 'Find Tutors',  path: '/student/tutors'    },
     { label: 'AI Assistant', path: '/student/ai'        },
-    // { label: 'Chat',         path: '/student/chat'      },
-    { label: 'Session', path: '/student/sessions' }
+    { label: 'Sessions',     path: '/student/sessions'  },
   ],
   tutor: [
     { label: 'Dashboard', path: '/tutor/dashboard' },
     { label: 'Profile',   path: '/tutor/profile'   },
-    {label: 'Sessions',  path: '/tutor/sessions'  },
-    // { label: 'Chat',      path: '/tutor/chat'      },
+    { label: 'Sessions',  path: '/tutor/sessions'  },
   ],
   admin: [
     { label: 'Dashboard',  path: '/admin/dashboard'  },

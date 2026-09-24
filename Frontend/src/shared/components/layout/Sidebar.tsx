@@ -5,7 +5,6 @@ import {
   LayoutGrid,
   Search,
   Sparkles,
-  MessageSquare,
   CalendarDays,
   Edit,
   Users,
@@ -13,6 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { useGetProfile } from '@/features/auth/hooks/useAuthApi';
+import { useDashboardStats } from '@/features/student/useStudentApi';
 
 interface SidebarLink {
   path: string;
@@ -33,17 +34,16 @@ const CONFIG: Record<Role, SidebarSection[]> = {
       { path: '/student/ai',        icon: Sparkles,       label: 'AI Assistant' },
     ]},
     { heading: 'Sessions', links: [
-      { path: '/student/chat',      icon: MessageSquare,  label: 'Messages', count: 2 },
       { path: '/student/sessions',  icon: CalendarDays,   label: 'Sessions' },
     ]},
   ],
   tutor: [
     { heading: 'Overview', links: [
-      { path: '/tutor/dashboard', icon: LayoutGrid, label: 'Dashboard' },
-      { path: '/tutor/chat',      icon: MessageSquare, label: 'Messages', count: 3 },
+      { path: '/tutor/dashboard', icon: LayoutGrid,   label: 'Dashboard' },
+      { path: '/tutor/sessions',  icon: CalendarDays, label: 'Sessions' },
     ]},
     { heading: 'Profile', links: [
-      { path: '/tutor/profile', icon: Edit, label: 'Edit Profile' },
+      { path: '/tutor/profile',   icon: Edit,         label: 'Edit Profile' },
     ]},
   ],
   admin: [
@@ -59,6 +59,10 @@ export function Sidebar({ role }: { role: Role }) {
   const navigate    = useNavigate();
   const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useGetProfile();
+  const { stats } = useDashboardStats(role === 'student' ? user?.id : undefined);
+  const aiQuestionsThisWeek = stats?.ai.questions_this_week ?? 0;
+  const aiCreditsPercent = Math.min((aiQuestionsThisWeek / 30) * 100, 100);
 
   const isActive = (path: string) => pathname.startsWith(path);
 
@@ -165,9 +169,9 @@ export function Sidebar({ role }: { role: Role }) {
                 <Sparkles size={14} />
                 <span className="text-xs font-bold tracking-wide">AI Credits</span>
               </div>
-              <div className="text-lg font-extrabold">47 <span className="text-sm font-normal opacity-70">/ 100</span></div>
+              <div className="text-lg font-extrabold">{aiQuestionsThisWeek} <span className="text-sm font-normal opacity-70">/ 30</span></div>
               <div className="mt-2 h-1.5 rounded-full bg-white/20">
-                <div className="h-full w-[47%] rounded-full bg-white/80" />
+                <div className="h-full rounded-full bg-white/80" style={{ width: `${aiCreditsPercent}%` }} />
               </div>
             </div>
             <div className="absolute -right-8 -bottom-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />

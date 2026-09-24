@@ -7,7 +7,7 @@ import { fadeUp, staggerContainer } from '@/shared/animations/motion';
 const FEATURES = [
   { icon: '🎯', title: 'Find Expert Tutors',      desc: 'Browse verified peer tutors by course, rating, availability, and hourly rate.' },
   { icon: '✦',  title: 'AI Academic Assistant',   desc: 'Get instant intelligent answers to your academic questions 24/7.'},
-  { icon: '💬', title: 'Real-Time Collaboration', desc: 'Chat, share files, and solve problems together in one workspace.'             },
+  { icon: '📹', title: '1-on-1 Tutoring Sessions', desc: 'Connect directly with peer tutors via interactive live sessions.'             },
   { icon: '📅', title: 'Easy Scheduling',          desc: 'Book sessions instantly with live calendar availability.'                    },
   { icon: '📊', title: 'Track Progress',           desc: 'Monitor your learning history and growth over time.'                        },
   { icon: '⭐', title: 'Trusted Community',        desc: 'Every tutor is student-rated and verified by our team.'                     },

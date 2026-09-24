@@ -7,11 +7,14 @@ import {
 import type { CreateSessionPayload, Session, SessionRead, AcceptSessionPayload, ReviewCreate, ReviewRead } from './types';
 
 export const useCreateSession = () => {
-
+  const qc = useQueryClient();
   const mutation = useMutation<Session, Error, CreateSessionPayload>({
     mutationFn: create_session,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["student_dashboard_stats"] });
+      qc.invalidateQueries({ queryKey: ["student-sessions"] });
+    },
   });
-  useQueryClient().invalidateQueries({ queryKey: ["student_dashboard_stats"] });
   return { ...mutation, createSession: mutation.mutateAsync };
 };
 

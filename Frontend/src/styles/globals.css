@@ -364,6 +364,12 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; outline: none; }
     --purple:   #7C6BCF;
     --red:      #C94B45;
   }
+
+  :root:not([data-theme="light"]) .floating-pill {
+    background: rgba(17, 21, 32, 0.72);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
 }
 
 /* Manual dark mode */
@@ -395,6 +401,12 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; outline: none; }
   --orange:   #D18A22;
   --purple:   #7C6BCF;
   --red:      #C94B45;
+}
+
+[data-theme="dark"] .floating-pill {
+  background: rgba(17, 21, 32, 0.72);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Manual light mode */

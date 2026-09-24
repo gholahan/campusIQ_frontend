@@ -151,19 +151,12 @@ export function TutorProfileView() {
 
             {/* actions */}
             <button
-              className="btn-primary w-full mb-2"
+              className="btn-primary w-full"
               onClick={() =>
                 navigate(`/student/booking/${tutor.user_id}`)
               }
             >
               Request Session
-            </button>
-
-            <button
-              className="btn-secondary w-full"
-              onClick={() => navigate("/student/chat")}
-            >
-              💬 Message
             </button>
 
           </div>

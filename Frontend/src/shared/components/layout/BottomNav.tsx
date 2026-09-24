@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
     CalendarDays,
     LayoutGrid,
-    MessageSquare,
     PencilLine,
     Search,
     ShieldAlert,
@@ -32,13 +31,6 @@ const LINKS: Record<Role, BottomNavLink[]> = {
       icon: Sparkles,
       label: 'AI',
     },
-    // {
-    //   key: 'chat',
-    //   path: '/student/chat',
-    //   icon: MessageSquare,
-    //   label: 'Chat',
-    //   badge: 2,
-    // },
     {
       key: 'sessions',
       path: '/student/sessions',
@@ -55,13 +47,6 @@ const LINKS: Record<Role, BottomNavLink[]> = {
       label: 'Home',
       badge: 3,
     },
-    // {
-    //   key: 'chat',
-    //   path: '/tutor/chat',
-    //   icon: MessageSquare,
-    //   label: 'Messages',
-    //   badge: 3,
-    // },
     {
       key: 'profile',
       path: '/tutor/profile',
@@ -72,7 +57,7 @@ const LINKS: Record<Role, BottomNavLink[]> = {
       key: 'sessions',
       path: '/tutor/sessions',
       icon: CalendarDays,
-      label: 'sssions',
+      label: 'Sessions',
     },
   ],
 
