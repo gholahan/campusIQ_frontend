@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { Loader2, ChevronDown } from 'lucide-react';
+import { Loader2, ChevronDown, Check, Copy, CircleAlert } from 'lucide-react';
 import type { AIMessage } from '@/features/ai/types';
 import { AiChatRole } from '@/features/ai/enums';
 import ReactMarkdown from "react-markdown";
@@ -14,6 +14,29 @@ function normalizeLatex(content: string): string {
   return content
     .replace(/\\\[([\s\S]*?)\\\]/g, (_, m) => `$$${m}$$`)
     .replace(/\\\(([\s\S]*?)\\\)/g, (_, m) => `$${m}$`);
+}
+
+async function writeToClipboard(content: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(content);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = content;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  try {
+    if (!document.execCommand('copy')) {
+      throw new Error('Clipboard copy failed');
+    }
+  } finally {
+    document.body.removeChild(textarea);
+  }
 }
 
 interface AIMessageListProps {
@@ -35,8 +58,39 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
   const userHasScrolledUp = useRef(false);
   const isAutoScrolling = useRef(false);
   const prevMessageCount = useRef(0);
+  const copyStatusTimeout = useRef<number | null>(null);
 
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [copyErrorMessageId, setCopyErrorMessageId] = useState<string | null>(null);
+
+  useEffect(() => () => {
+    if (copyStatusTimeout.current !== null) {
+      window.clearTimeout(copyStatusTimeout.current);
+    }
+  }, []);
+
+  const copyMessage = useCallback(async (message: AIMessage) => {
+    if (copyStatusTimeout.current !== null) {
+      window.clearTimeout(copyStatusTimeout.current);
+    }
+
+    setCopiedMessageId(null);
+    setCopyErrorMessageId(null);
+
+    try {
+      await writeToClipboard(message.content);
+      setCopiedMessageId(message.id);
+      copyStatusTimeout.current = window.setTimeout(() => {
+        setCopiedMessageId((currentId) => currentId === message.id ? null : currentId);
+      }, 2000);
+    } catch {
+      setCopyErrorMessageId(message.id);
+      copyStatusTimeout.current = window.setTimeout(() => {
+        setCopyErrorMessageId((currentId) => currentId === message.id ? null : currentId);
+      }, 2500);
+    }
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     const el = scrollRef.current;
@@ -235,6 +289,38 @@ export function AIMessageList({ messages, loading, hasNextPage, isFetchingNextPa
                   {normalizeLatex(m.content)}
                 </ReactMarkdown>
               </div>
+
+              {m.role === AiChatRole.Assistant && (
+                <button
+                  type="button"
+                  onClick={() => copyMessage(m)}
+                  className={`mt-1 inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-[var(--bg3)] hover:text-[var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${
+                    copyErrorMessageId === m.id ? 'text-[var(--cred)]' : 'text-[var(--text3)]'
+                  }`}
+                  aria-label={
+                    copiedMessageId === m.id
+                      ? 'Copied response'
+                      : copyErrorMessageId === m.id
+                        ? 'Copy failed'
+                        : 'Copy response'
+                  }
+                  title={
+                    copiedMessageId === m.id
+                      ? 'Copied'
+                      : copyErrorMessageId === m.id
+                        ? 'Copy failed'
+                        : 'Copy response'
+                  }
+                >
+                  {copiedMessageId === m.id ? (
+                    <Check size={15} />
+                  ) : copyErrorMessageId === m.id ? (
+                    <CircleAlert size={15} />
+                  ) : (
+                    <Copy size={15} />
+                  )}
+                </button>
+              )}
             </div>
           </div>
         ))}
